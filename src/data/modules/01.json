@@ -1,0 +1,202 @@
+{
+  "num": "01",
+  "title": "概念设定",
+  "badge": "Module 01 · Concept ⚡ AI 提速",
+  "objective": "产出一套干净、能被 AI 准确转成 3D 的 2D 参考图：一张定稿正视图 + 多视图转面（理想含侧 / 背 / 3-4 视）+ 可选分件图。这套图是后面 8 步的地基——它有多干净，你的 3D 角色就有多干净。",
+  "meta": [
+    { "k": "时长", "v": "45–90 分钟" },
+    { "k": "难度", "v": "⚡ AI 提速" },
+    { "k": "工具", "v": "ChatGPT · Nano Banana Pro" },
+    { "k": "交付物", "v": "A-pose 多视图参考集" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · 为什么这一步定生死",
+      "h2": "下游图生 3D 是\"垃圾进、垃圾出\"",
+      "paras": [
+        "Meshy、Tripo 这类图生 3D 工具，几乎完全吃你喂进去的参考图。你的参考有多干净，出来的 mesh 就有多干净。"
+      ],
+      "box": [
+        "一张戏剧光、动态姿势、花背景的\"好看插画\"，到了 3D 生成器手里会变成一坨融化的几何体——腋下粘连、比例失真、背景也被建进网格。",
+        "所以这一步的目标不是画得漂亮，是画得\"能被机器读懂\"。投在这里的每一分钟，会在后面 8 步里成倍返还。"
+      ]
+    },
+    {
+      "type": "rules",
+      "snum": "/ 02 · 图生 3D 的 5 条硬规则",
+      "h2": "参考图必须同时满足这 5 条",
+      "intro": "下面每一道工序，都是为了让最终参考满足这 5 条。先把规则记死，再动手。",
+      "rules": [
+        { "h4": "A-pose / T-pose · 四肢分离", "p": "手臂贴身躯，生成器分不清哪是手臂哪是身体，腋下会粘连。A-pose（手臂下垂 30–45°）通常比 T-pose 更稳，手腕也不容易和大腿穿模。" },
+        { "h4": "中性平光 · 无强阴影", "p": "戏剧光、轮廓光会被直接烤进几何和贴图，进了 3D 改不掉。要的是均匀的影棚柔光。" },
+        { "h4": "纯色背景 · 无场景道具", "p": "纯白或纯灰，无地面、无投影、无道具。背景越干净，抠图和生成越准，否则背景会被一起建模。" },
+        { "h4": "正交视角 · 无透视压缩", "p": "平视、无大仰俯角。透视会让生成器误判比例——头大脚小、近大远小全乱套。" },
+        { "h4": "多视图一致 · 同一个角色", "p": "正 / 侧 / 背是同一个人：同配色、同装备、同比例。这是 AI 最难、也是本节核心战场——靠一致性模型 + 参考输入解决。" }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 03 · 逐道工序",
+      "h2": "从一句点子，到一套合规参考",
+      "intro": null,
+      "substeps": [
+        {
+          "tag": "1.1",
+          "title": "立意 · 先用文字把角色钉死",
+          "opt": null,
+          "paras": [
+            "别一上来就抽卡。先用 ChatGPT 把\"设定\"写清楚：一句话概念、剪影特征、配色、标志性细节。文字越清楚，图越好出、越一致。直接套下面这条结构化 prompt："
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "构思 · ChatGPT",
+              "text": "You are a senior character designer for a stylized 3D action game.\nLock a production-ready character concept from my seed idea. Output:\n1. One-paragraph concept (who they are, their world)\n2. Silhouette features (what makes them readable as a black shape)\n3. Color palette: 3-4 hex colors with roles (primary / secondary / accent)\n4. 5 distinctive design details (gear, marks, materials)\n5. A ready-to-paste FRONT-VIEW image prompt: full-body, A-pose,\n   plain white background, neutral studio lighting.\n\nSeed idea: [你的一句话点子，例如 a wandering blue-cat spirit swordsman]\nKeep it production-oriented: clean silhouette, separable parts,\nno extreme anatomy that is hard to model."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "为什么：先有文字设定，后面每次生图都能引用同一套描述，是保证多视图一致的第一道保险。" }
+          ]
+        },
+        {
+          "tag": "1.2",
+          "title": "出正视图 master · 后面所有视图的真相源",
+          "opt": null,
+          "paras": [
+            "用结构化 prompt 生成正视图，一次多生几张，挑剪影最强、最符合设定的那张。结构永远是：主体 + 风格 + 姿势 + 取景 + 光 + 背景。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "正视图 master · 文生图",
+              "text": "full-body character concept of [角色描述], front orthographic view,\nA-pose with arms held ~35° away from the body, legs slightly apart,\ncharacter reference sheet, flat even studio lighting, soft shadows only,\nplain solid white background, clean readable design, [STYLE],\nsymmetrical, entire figure visible head to feet, no cropping,\nhigh detail, sharp focus\n\navoid: dramatic lighting, rim light, busy background, props, ground shadow,\naction pose, foreshortening, extreme perspective, multiple characters,\ntext, watermark, cropped limbs"
+            }
+          ],
+          "calls": [
+            { "type": "rule", "text": "剪影测试：把选中的图变成纯黑剪影，还能一眼认出是谁吗？认不出 → 设计不够强，重抽。好看 ≠ 好读。" }
+          ]
+        },
+        {
+          "tag": "1.3",
+          "title": "定稿清理 · 把 master 收干净",
+          "opt": null,
+          "paras": [
+            "选中那张后，用图像编辑把它收干净，然后锁死，不再改设计。这张就是你的 master。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "清理定稿 · 图生图编辑",
+              "text": "Using this image, keep the EXACT same character design, outfit and colors.\nClean it up only:\n- remove the background to pure white\n- complete any cropped limbs so the full body (head to feet) is visible\n- flatten dramatic lighting into even neutral studio light\n- correct obvious proportion issues\nA-pose, front orthographic view. Do not redesign anything."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.4",
+          "title": "转面 / 多视图 · 用一致性模型从 master 派生",
+          "opt": null,
+          "paras": [
+            "核心技巧：把 master 当参考图喂给 Nano Banana Pro（Gemini 3 Pro Image）——它的强项正是\"角色身份锁定、跨图保持一致\"，最多支持喂 14 张参考。让它只换视角、不改设计。"
+          ],
+          "bullets": [
+            "单图转面表（简单角色）：一张图里出正 / 侧 / 背三视，对齐同高度。",
+            "逐张派生（复杂角色）：逐个视角生成，每次把 master + 已定视图一起喂进去当参考，一致性更稳。"
+          ],
+          "prompts": [
+            {
+              "label": "侧 / 背视派生 · Nano Banana Pro",
+              "text": "Use the provided reference image as the single source of truth for this\ncharacter. Generate the SAME character in a [side profile / back]\northographic view. Keep identical outfit, colors, proportions, gear and\ndesign details - this must read as the EXACT same character, just rotated.\nA-pose, flat neutral studio lighting, plain white background,\ncharacter turnaround sheet style. Do not change or add any design element."
+            },
+            {
+              "label": "一次出三视图 · turnaround",
+              "text": "Create a character turnaround / model sheet of THIS exact character showing\nfront, side and back views in a row. All A-pose, identical design and colors,\nflat neutral lighting, plain white background, evenly aligned at the same\nheight and scale."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "开 Thinking 模式：Nano Banana Pro 的推理模式会先生成草图再定稿，复杂角色的一致性明显更稳。一致性还是飘？把已生成的视图也加进参考输入里，给它更多\"锚点\"。" }
+          ]
+        },
+        {
+          "tag": "1.5",
+          "title": "分件 · 拆出可单独生成的部件",
+          "opt": "复杂角色才需要",
+          "paras": [
+            "武器、头盔、披风、大型配饰这类，单独抠出来、纯白底、正交。后面用更高质量单独生成 3D 再组装——比硬生一整个复杂角色干净太多。能拆就拆。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "分件抽取 · 图生图",
+              "text": "Isolate the [weapon / helmet / cape] from this character.\nShow it ALONE on a plain white background, orthographic front and side\nviews, clean even studio lighting, no character, no background props,\nproduct-shot style, high detail."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.6",
+          "title": "整理交付 · 命名、对齐、归档",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "统一分辨率与取景，人物在画面里大小一致，方便后面逐视图比对。",
+            "命名规范：char_front / char_side / char_back / char_3q / part_weapon…",
+            "建一个 01_concept 文件夹，整套归档。这是进模块 02 的输入包。"
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 04 · 风格分支",
+      "h2": "同一套规则，三种风格微调",
+      "branches": [
+        { "name": "🛡️ 写实 / 半写实", "p": "规则照旧，prompt 里追加风格词即可。3D 生成最友好的一类。", "code": "semi-realistic game character, PBR-friendly, neutral expression, balanced anatomy" },
+        { "name": "✨ 二次元 / 动漫", "p": "注意：大眼、夸张比例会让 3D 生成更难，剪影要更克制。", "code": "anime style, cel-shaded, clean lineart, flat colors, readable silhouette" },
+        { "name": "🐱 卡通 / Q 版", "p": "比例可以夸张，但务必四肢分离、剪影清晰，否则圆乎乎一团会粘连。", "code": "chibi / stylized cartoon, exaggerated proportions, separated limbs, bold shapes" }
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 05 · 常见翻车",
+      "h2": "这些坑，新手 80% 都踩过",
+      "items": [
+        "用了戏剧光 / 逆光 → 阴影被烤死，3D 阶段没法修。",
+        "动态姿势（跑、挥剑） → 生成器读不出标准比例，肢体粘连。",
+        "透视太强 → 比例失真，头大脚小。",
+        "多视图各画各的 → 正侧背不是同一个人，后面拼不起来。",
+        "背景有道具 / 地面 → 生成器把背景一起建进 mesh。",
+        "一次硬生超复杂角色 → 细节糊成一团；该分件就分件。",
+        "抽到好看就停 → 没做剪影测试，好看 ≠ 好读。"
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 06 · 本节交付物",
+      "h2": "勾完这些，才算过关",
+      "items": [
+        { "text": "1 张定稿正视图", "small": "A-pose / 中性光 / 纯白底 / 正交" },
+        { "text": "至少 1 张背视图", "small": "同一角色，配色 / 装备 / 比例一致" },
+        { "text": "理想：+ 侧视图 + 3/4 视图", "small": "视图越全，模块 02 生成越准" },
+        { "text": "复杂角色：分件图若干", "small": "武器 / 头盔 / 披风，纯白底正交" },
+        { "text": "全部命名归档进 01_concept", "small": "这是进下一步的输入包" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 07 · 进入下一步前自检",
+      "title": "🐾 三问，全过才放行",
+      "questions": [
+        "把任意一张图变黑剪影，还认得出角色吗？",
+        "正 / 侧 / 背放一起，是同一个人吗（配色 / 装备 / 比例）？",
+        "有没有任何强阴影、透视、花背景还没清掉？"
+      ],
+      "pass": "▸ 三个都过 → 进入模块 02：3D 模型生成。"
+    }
+  ],
+  "prev": null,
+  "next": null
+}

@@ -1,0 +1,200 @@
+{
+  "num": "02",
+  "title": "3D Model Generation",
+  "badge": "Module 02 · 3D Generation ⚡ AI-fast",
+  "objective": "Feed the 2D references from Module 01 into an image-to-3D tool and get back a base mesh you can keep working on, plus separated parts. This step isn't about perfection—it's about a clean, workable blank you can carry into Blender.",
+  "meta": [
+    { "k": "Time", "v": "30–60 min" },
+    { "k": "Difficulty", "v": "⚡ AI-fast" },
+    { "k": "Tools", "v": "Meshy 6 · Tripo · Blender" },
+    { "k": "Deliverable", "v": "base mesh + parts" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "2D references → your first 3D mesh",
+      "paras": [
+        "Picking up from Module 01: that set of A-pose, pure-white-background, view-consistent references finally pays off—they go straight into the generator's multi-view mode.",
+        "Image-to-3D tools (Meshy / Tripo) turn those references into a textured 3D mesh in minutes. But that mesh is a blank, not a finished asset: messy topology, high poly count, blurry detail. Its whole job is to give the sculpting step (03) and retopology step (04) a starting point.",
+        "The one goal here: land a base mesh with the right silhouette, right proportions, and no big melted patches or holes. A rough surface is fine—you'll rebuild it later."
+      ],
+      "box": []
+    },
+    {
+      "type": "prose",
+      "snum": "/ 02 · Pick a generator first",
+      "h2": "Meshy or Tripo?",
+      "paras": [
+        "Both work; they're aimed at different things. Either is fine for characters, so sign up for both (both have free credits), run the same image through each, and keep the cleaner result.",
+        "Meshy 6 (~1 min, quality + full-pipeline platform): \"sculpt-grade\" fidelity, watertight meshes, up to nearly 600k faces; multi-view mode: upload up to 3 images (front/side/back), the setting that matters most; pose control A-Pose / T-Pose / custom; native Blender plugin (also Unity/UE/Maya); quad/tri, target polycount, Low Poly, PBR; 100 free credits/month. Pick it when: you care most about mesh and texture quality, want a one-click Blender link, and are running the full pipeline.",
+        "Tripo (~10 sec, speed + clean topology): Turbo spits out a model in about 10 seconds, so rerolling is lightning-fast; Smart Mesh: clean low-poly quads that are easy to rig by hand; supports text/image-to-3D, multi-view, auto-rigging, animation; DCC Bridge sends it to Blender (4.1+) in one click; 300 free credits/month, with steeper annual discounts; HD models can add detail. Pick it when: you want to reroll shapes fast, want clean quad topology, and free credits come first.",
+        "Bluecat's take: for complex characters, Meshy multi-view gives more reliable body quality; for quickly testing different design directions, reroll with Tripo. Don't agonize over \"which is better\"—run the same image through both and see whose silhouette and back read better."
+      ],
+      "box": []
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 03 · Step by step",
+      "h2": "From reference images to a blank inside Blender",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "2.1",
+          "title": "Prep the inputs",
+          "opt": null,
+          "paras": [ "Get your Module 01 images into the shape a generator likes to eat:" ],
+          "bullets": [
+            "Resolution ≥ 1024×1024—the sharper, the more accurate the proportions.",
+            "Pure white / neutral gray / transparent PNG background, so the AI focuses on the subject.",
+            "Format png / jpg / webp, ≤ 20MB per image.",
+            "Multi-view: one angle and one object per image—don't cram front/side/back into a single image."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "2.2",
+          "title": "The settings that matter",
+          "opt": null,
+          "paras": [
+            "Get the settings right and you save half the rework later. Recommended config, using Meshy as the example:",
+            "Meshy · recommended character settings: Multi-view — on · upload front/side/back (matters most, always on); Pose — A-Pose (match your reference); Model — Meshy 6 (highest quality); Topology — Quad (easier for later sculpting/rigging); Target Polycount — mid-high (don't fear a high face count here, you'll retopo later); PBR / Texture — on (gives Module 07 a base to work from); Symmetry — on for symmetric characters (tidier left/right)."
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": [
+            { "type": "rule", "text": "Multi-view is the make-or-break setting. Single-image generation \"imagines\" the back and often botches it; feed front/side/back and the back and side geometry come out far more accurate. The extra effort you put into Module 01 cashes out right here." }
+          ]
+        },
+        {
+          "tag": "2.3",
+          "title": "Generate + reroll",
+          "opt": null,
+          "paras": [
+            "Don't expect a hole-in-one. Generate 3–5 variants from the same references and look at each. Generators are random, so rolling a few more times and picking the cleanest beats endlessly tweaking parameters."
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "2.4",
+          "title": "Evaluate the output",
+          "opt": null,
+          "paras": [ "This step decides whether you carry a good blank into Blender or a piece of junk. Check it against these four:" ],
+          "bullets": [
+            "Silhouette test: overlay the model's projected silhouette on the original reference—does the outline line up?",
+            "Back/side check: spin it around—do the back and side make sense (not a blurry mush)?",
+            "Melting/fusing: are the armpits, crotch, fingers, and accessory seams fused into a blob?",
+            "Hallucinated detail: did the AI add weird stuff that isn't in the reference?"
+          ],
+          "prompts": [],
+          "calls": [
+            { "type": "warn", "text": "If any of the four shows big holes, badly distorted proportions, or a fused body → don't settle. Go back to 2.3, reroll, or switch tools. Every corner you cut at the blank stage comes back tenfold later." }
+          ]
+        },
+        {
+          "tag": "2.5",
+          "title": "Fixing a weak output",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Reroll: try another variant, or tweak the multi-view inputs.",
+            "Switch tools: Meshy came out blurry → try Tripo, and vice versa.",
+            "Fix the reference: if one angle keeps failing, go back to Module 01 and redo that view more clearly.",
+            "Reduce complexity: if a complex character won't generate in one pass, split it into parts via 2.6."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "2.6",
+          "title": "Generate parts separately",
+          "opt": "complex characters",
+          "paras": [
+            "The parts you split out in Module 01 (weapon, helmet, cape) generate at higher quality on their own, then get assembled in Blender. When you have no reference image on hand, you can also text-to-3D a part directly:"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Text-to-3D a part · Meshy / Tripo",
+              "text": "a [部件，如 fantasy curved sword / round shield], game asset,\nclean topology, neutral materials, single solid object,\nno scene, no background, centered, A-pose-friendly scale"
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "In a text-to-3D prompt, avoid \"scene / environment\" and write \"single solid object / game asset\"—that's how you get a clean single object instead of a whole environment." }
+          ]
+        },
+        {
+          "tag": "2.7",
+          "title": "Export + into Blender",
+          "opt": null,
+          "paras": [
+            "Export in the right format, then run four checks the moment you're in Blender—don't work for hours only to discover the model is crooked."
+          ],
+          "bullets": [
+            "Format: the least hassle is a direct link via Meshy/Tripo's Blender plugin; for a manual import use FBX or .blend (keeps materials), or OBJ/GLB for general use.",
+            "Scale: after import, compare against a reference cube/human figure—are the proportions right?",
+            "Origin: is the origin at the feet/center? If it's off, reset it first.",
+            "Normals: turn on Face Orientation—any red flipped faces?",
+            "Orientation: the character faces -Y and stands on the ground (Z up)."
+          ],
+          "prompts": [],
+          "calls": [
+            { "type": "tip", "text": "Meshy 6 exports GLB / FBX / OBJ / USDZ / STL / BLEND / 3MF; to keep textures and material slots, prefer .blend or FBX." }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 04 · The key mindset",
+      "h2": "An AI mesh is just a blank—don't wrestle with it here",
+      "paras": [],
+      "box": [
+        "The most common beginner mistake: rerolling dozens of times at this step, trying to pull out a perfect model directly. It's impossible, and unnecessary.",
+        "AI-generated topology is messy by nature—triangles smeared together, inflated face counts, deforming areas that are unusable. It's destined to be rebuilt in Module 03 (sculpting) and Module 04 (retopology).",
+        "So this step has just one standard: if the form is right, it's good—hand it to the next step. Save the perfectionism for where it actually counts."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 05 · Common wipeouts",
+      "h2": "These traps get you every time",
+      "items": [
+        "Single-image generation with no multi-view → the back is pure guesswork, and turning it around reveals a monster.",
+        "Pose not set to A-Pose → limbs fuse together, undoing all your Module 01 effort.",
+        "Input images too low-res → distorted proportions, lost detail.",
+        "Using the first roll with no rerolls → you miss a cleaner variant.",
+        "Chasing perfection at the blank stage → wasted credits, since it all gets rebuilt anyway.",
+        "Importing to Blender without checking scale/normals → you're halfway done before you notice the model is crooked and inside-out.",
+        "Forcing a complex character in one shot → accessories blob together; split it into parts when you should."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 06 · Deliverables for this step",
+      "h2": "Tick these off to pass",
+      "items": [
+        { "text": "1 base mesh that passed review", "small": "silhouette right / proportions right / no big holes or fusing" },
+        { "text": "Complex characters: separately generated parts", "small": "weapon / helmet / cape, etc." },
+        { "text": "Imported into Blender and passed the four checks", "small": "Scale / Origin / Normals / Orientation" },
+        { "text": "Project file with textures/materials kept", "small": ".blend or FBX, archived into 02_basemesh" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 07 · Self-check before moving on",
+      "title": "🐾 Three questions—pass all to proceed",
+      "questions": [
+        "Overlay the model's projected silhouette on the reference—does the outline line up?",
+        "Spin around the model—do the back and side make sense (not a blurry mush)?",
+        "In Blender, are the scale, origin, normals, and orientation all correct?"
+      ],
+      "pass": "▸ All three pass → on to Module 03: Sculpting (🐾 Bluecat coaches you through it—the hard part begins)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

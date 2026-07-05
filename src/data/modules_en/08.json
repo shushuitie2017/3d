@@ -1,0 +1,211 @@
+{
+  "num": "08",
+  "title": "Rigging + Animation",
+  "badge": "Module 08 · Rigging 🐾 Guided by Bluecat",
+  "objective": "Give your character a skeleton, bind the mesh to the bones, and let it pose and move. This is the last real craft hurdle — AI builds the skeleton and weights in seconds, but wherever the deformation goes wrong, you have to paint it by hand.",
+  "meta": [
+    { "k": "Time", "v": "2–5 hours" },
+    { "k": "Difficulty", "v": "🐾 Guided by Bluecat" },
+    { "k": "Tools", "v": "Meshy · Mixamo · Blender" },
+    { "k": "Deliverable", "v": "A cleanly-deforming rigged character + animation" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step is about",
+      "h2": "Give the statue its bones",
+      "paras": [
+        "Picking up from Module 07: you have a textured character — but right now it's a lifeless statue. Rigging brings it to life.",
+        "Rigging = building a digital skeleton inside the model, then \"wrapping\" the mesh onto the bones (skinning) so every vertex answers to certain bones. Turn a bone and the mesh bends with it. Once this step is done, the character can pose and take animations."
+      ],
+      "box": []
+    },
+    {
+      "type": "rules",
+      "snum": "/ 02 · Three core concepts",
+      "h2": "Skeleton · Skinning · Weights",
+      "intro": "",
+      "rules": [
+        { "h4": "Armature · Bone hierarchy", "p": "A set of bones with a parent-child hierarchy: the hips are the root, connecting to the spine, limbs, and fingers. Move a bone and its child bones follow." },
+        { "h4": "Skinning · Binding the mesh on", "p": "Bind the mesh to the armature, establishing which vertices belong to which bones. Once bound, the mesh moves when the bones move." },
+        { "h4": "Weight · Who it listens to, and how much", "p": "How much each vertex is influenced by each bone (0–1). Paint the weights well and joints bend naturally without collapsing. This is where the real craft of this step lives." }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 03 · The 2026 reality play",
+      "h2": "AI auto-rigs, you fix the weights",
+      "paras": [],
+      "box": [
+        "It used to take hours to place bones by hand and paint whole-body weights. Now AI builds the skeleton, computes skinning weights, and even generates facial blend shapes in tens of seconds.",
+        "But what AI gives you is a \"generic solution\" — it moves fine overall, yet joints, armpits, the crotch, and fingers often bend awkwardly and need you to hand-paint fixes in Blender. That's why this step is 🐾 guided practice.",
+        "And here's where the whole pipeline's cause-and-effect hides: if the joint edge loops in Module 04 were laid out right, the weights barely need fixing; if they were laid out wrong, no amount of painting will save them. Half of how good a rig turns out is decided back at the topology."
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 04 · Tool routes",
+      "h2": "Where do you rig? Pick one",
+      "branches": [
+        { "name": "Meshy · Smoothest pipeline", "p": "Auto-rigs humanoids/quadrupeds in 30 seconds, with skinning weights + facial blend shapes, a built-in bone editor to rename and align for Unity/UE5, plus 100+ animations.", "code": "In the pipeline · end to end" },
+        { "name": "Tripo · Smooth weights", "p": "Clean skeleton + smooth skinning, supports T-pose export (the killer combo with Mixamo); rigs humanoids, quadrupeds, and mechanical models alike.", "code": "Export T-pose FBX/GLB" },
+        { "name": "Mixamo · Free animation library", "p": "Free from Adobe — upload an FBX and it auto-rigs humanoids, with a huge library of ready-made animations (walk/run/fight/idle). Needs a T-pose, humanoids only.", "code": "Free · easiest for animations" },
+        { "name": "AccuRIG 2 · Precise bones", "p": "Free standalone software from Reallusion, precise bone placement and good deformation, works for humanoid and non-humanoid alike, exports FBX to any engine.", "code": "Free · least cleanup" }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 05 · Step by step",
+      "h2": "From a single bone to a character that walks",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "8.1",
+          "title": "Pose + prep",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Mixamo needs a T-pose (arms out level); Meshy/Tripo accept an A-pose too (Tripo can even export a T-pose).",
+            "Apply all transforms (reset position/rotation/scale), center the character, face it forward, feet on the ground.",
+            "Make sure the mesh is clean (no duplicate verts / non-manifold geometry) — these throw off auto-rigging."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "8.2",
+          "title": "Auto-rig",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Upload the model, choose the character type (humanoid/biped/quadruped), align it, and hit auto-rig.",
+            "Skeleton + skinning weights come out in tens of seconds (some tools also add facial blend shapes).",
+            "For multi-armature / multi-part characters (a weapon in the hand), remember to parent the weapon to the hand bone."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "8.3",
+          "title": "Check the deformation",
+          "opt": "Bend every joint",
+          "paras": [
+            "Don't trust \"it auto-rigged fine.\" Go into Pose mode and bend every joint to its limit to watch the deformation:"
+          ],
+          "bullets": [
+            "Elbow / knee: bend past 90° — any collapse or pinching?",
+            "Shoulder / hip: big rotations — any tearing or clipping in the armpit/crotch?",
+            "Wrist / forearm: twist — any candy-wrapper collapse?",
+            "Fingers / neck: bend each one — stiff, or dragging neighbors along?"
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "8.4",
+          "title": "Hand-fix the weights",
+          "opt": "The real skill",
+          "paras": [
+            "For the bad joints you found, go into Blender's Weight Paint mode and paint by hand. Red = full weight, blue = zero."
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": [
+            { "type": "warn", "text": "If a joint collapses no matter how you paint — stop grinding on weights, it's a topology problem: that joint is missing a deformation loop. Go back to Module 04 and add the loop; it beats a million brush strokes." }
+          ]
+        },
+        {
+          "tag": "8.5",
+          "title": "Bone naming / retargeting",
+          "opt": "Key for engines",
+          "paras": [
+            "To use ready-made animations on your character, the bones need names the engine recognizes:"
+          ],
+          "bullets": [
+            "Rename to match the target: Unity Humanoid / UE5 Mannequin / Mixamo naming conventions.",
+            "Meshy's bone editor and Blender's Rename can both batch-align them.",
+            "With the names right, animations retarget across characters — no need to redo them."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "8.6",
+          "title": "Add animation",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Fast route: drop in a ready-made animation library (Mixamo / Meshy 100+ moves: idle, walk, run, wave).",
+            "Custom route: hand-key frames in Blender's Action Editor for a bespoke move.",
+            "Portfolio tip: one idle + one walk/turn loop is enough to show the character moves and deforms cleanly."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "8.7",
+          "title": "Export",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Export FBX (with armature + animation tracks) or GLB, baking skeleton/weights/animation in together.",
+            "Confirm the animation plays inside the exported file and the bone naming is standard.",
+            "Archive into 08_rig, ready for the engine in Module 09."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 06 · Key discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① AI rigs 80%, weight cleanup is craft. Auto-rig is the start, not the finish — every joint's deformation must be bent and fixed one by one.",
+        "② You only know it's good once you bend it. Looking fine when static means nothing; every joint must be checked at its extreme angle.",
+        "③ The root of collapse is topology. A joint you can't smooth out means going back to Module 04 to add a loop — proof that the whole pipeline is one interlocking chain."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 07 · Common wipeouts",
+      "h2": "These traps show up the moment it moves",
+      "items": [
+        "Skipping the check after auto-rig → one animation and the joints crumple.",
+        "Wrong pose / feet off the ground → auto-rigged bones come out skewed and misaligned.",
+        "Forearm-twist candy-wrapper collapse → missing a twist bone, or the weight transition is too hard.",
+        "Messy bone names → animations can't retarget, and it all has to be redone.",
+        "Grinding on weights without checking topology → the joint is missing a loop, so you paint your arm off for nothing.",
+        "Weapon not parented to the hand bone → you swing your hand and the sword stays put.",
+        "Export without baking the animation / missing the armature → you get a motionless model in the engine."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 08 · This step's deliverables",
+      "h2": "Tick these off to pass",
+      "items": [
+        { "text": "Character with armature + skinning", "small": "Mesh bound to the skeleton" },
+        { "text": "Clean deformation on every joint", "small": "Elbow/knee/shoulder/hip/wrist/finger bend to the limit without collapsing" },
+        { "text": "Bone names aligned to the target engine", "small": "Unity Humanoid / UE5 / Mixamo" },
+        { "text": "At least one playable animation", "small": "Idle + walk/turn loop" },
+        { "text": "Export file with armature + animation, archived", "small": "FBX/GLB → 08_rig" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 09 · Self-check before the next step",
+      "title": "🐾 Three questions — pass all to proceed",
+      "questions": [
+        "Bend every joint to its limit — no collapse, tearing, or candy-wrapper?",
+        "Are the bone names aligned to the target engine, and can animations retarget?",
+        "Are the armature + animation both in the export file, and does it play?"
+      ],
+      "pass": "▸ All three pass → on to Module 09: export to the engine (⚡ AI-fast, the last step, closing the loop)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

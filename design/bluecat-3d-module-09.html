@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模块 09 · 导出到引擎 — 蓝猫 AI × 3D 角色产线</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#090D18;--night:#0F1626;--surface:#161F35;--surface-2:#1C2742;
+  --line:rgba(110,150,220,.16);--line-2:rgba(110,150,220,.32);
+  --text:#E9EEFA;--muted:#90A0C0;--faint:#5E6E92;
+  --cobalt:#5B7CFA;--glow:#37E1FF;--gold:#F5C24E;
+  --gold-dim:rgba(245,194,78,.12);--cobalt-dim:rgba(91,124,250,.14);--glow-dim:rgba(55,225,255,.1);
+  --red:#F0685B;--red-dim:rgba(240,104,91,.1);--green:#54C99A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--abyss);color:var(--text);font-family:"Inter","Noto Sans SC",system-ui,sans-serif;
+  line-height:1.75;-webkit-font-smoothing:antialiased;font-size:16px;overflow-x:hidden}
+.disp{font-family:"Sora","Noto Sans SC",sans-serif}.mono{font-family:"JetBrains Mono",monospace}
+.wrap{max-width:840px;margin:0 auto;padding:0 26px}
+a{color:inherit}
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::before{content:"";position:absolute;top:-220px;left:50%;transform:translateX(-50%);
+  width:720px;height:720px;border-radius:50%;background:radial-gradient(circle,rgba(55,225,255,.08),transparent 60%);filter:blur(20px)}
+
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);background:rgba(9,13,24,.74);border-bottom:1px solid var(--line)}
+.nav-in{max-width:840px;margin:0 auto;padding:12px 26px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;font-family:"Sora",sans-serif;font-weight:700;font-size:16px;text-decoration:none}
+.brand svg{width:27px;height:27px;display:block}
+.nav-back{margin-left:auto;font-size:13.5px;color:var(--muted);text-decoration:none;font-family:"JetBrains Mono",monospace;transition:color .2s}
+.nav-back:hover{color:var(--glow)}
+
+.prog{position:sticky;top:52px;z-index:40;background:rgba(9,13,24,.74);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:11px 0}
+.prog-in{max-width:840px;margin:0 auto;padding:0 26px;display:flex;align-items:center;gap:14px}
+.prog-bars{display:flex;gap:5px;flex:1}
+.prog-bars i{height:5px;flex:1;border-radius:3px;background:var(--surface-2)}
+.prog-bars i.on{background:linear-gradient(90deg,var(--cobalt),var(--glow))}
+.prog-bars i.cur{background:var(--gold);box-shadow:0 0 10px rgba(245,194,78,.5)}
+.prog-label{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.prog-label b{color:var(--gold)}
+
+.lhead{position:relative;z-index:1;padding:48px 0 34px}
+.crumb{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--faint);margin-bottom:20px;letter-spacing:.04em}
+.crumb a{text-decoration:none;color:var(--muted)}
+.mod-badge{display:inline-flex;align-items:center;gap:10px;font-family:"JetBrains Mono",monospace;font-size:12px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--glow);background:var(--glow-dim);border:1px solid var(--line-2);
+  border-radius:30px;padding:6px 15px;margin-bottom:22px}
+h1.ltitle{font-family:"Sora","Noto Sans SC",sans-serif;font-weight:800;font-size:clamp(30px,5.6vw,50px);line-height:1.1;letter-spacing:-.02em;margin-bottom:18px}
+.lobjective{font-size:clamp(16px,2.2vw,18.5px);color:var(--muted);max-width:640px;margin-bottom:28px}
+.lobjective b{color:var(--text);font-weight:600}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap}
+.meta{display:flex;flex-direction:column;gap:3px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 16px;min-width:0}
+.meta .mk{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.meta .mv{font-size:13.5px;color:var(--text);font-weight:600}.meta .mv.ai{color:var(--glow)}
+
+section{position:relative;z-index:1;padding:36px 0;border-top:1px solid var(--line)}
+.snum{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.1em;margin-bottom:10px}
+h2.sh{font-family:"Sora","Noto Sans SC",sans-serif;font-weight:700;font-size:clamp(21px,3.2vw,28px);line-height:1.25;letter-spacing:-.01em;margin-bottom:18px}
+p.tx{color:var(--muted);margin-bottom:16px;font-size:15.5px}
+p.tx b{color:var(--text);font-weight:600}p.tx .hl{color:var(--glow);font-weight:500}
+kbd{font-family:"JetBrains Mono",monospace;font-size:12px;background:var(--surface-2);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 7px;color:var(--text);white-space:nowrap}
+
+.handoff{display:flex;gap:13px;align-items:center;background:var(--cobalt-dim);border:1px solid var(--line-2);border-radius:11px;padding:15px 18px;margin-bottom:18px;font-size:14.5px}
+.handoff .hi{font-size:18px;flex-shrink:0}.handoff b{color:var(--cobalt)}.handoff span{color:var(--text)}
+
+.why{background:linear-gradient(150deg,var(--surface),var(--night));border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:22px 26px}
+.why p{color:var(--text);font-size:15.5px;margin-bottom:12px}.why p:last-child{margin-bottom:0}.why b{color:var(--gold);font-weight:600}
+
+.routes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.route{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;border-top:3px solid var(--cobalt)}
+.route.best{border-top-color:var(--gold)}
+.route-top{display:flex;align-items:baseline;gap:9px;margin-bottom:7px}
+.route-name{font-family:"Sora",sans-serif;font-size:16px;font-weight:700}
+.route-tag{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:10px;padding:2px 9px;border-radius:20px;color:var(--muted);background:var(--abyss);border:1px solid var(--line)}
+.route.best .route-tag{color:var(--gold);background:var(--gold-dim);border-color:rgba(245,194,78,.3)}
+.route p{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:8px}
+.route p b{color:var(--text)}
+.route .meta-line{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--faint)}
+@media(max-width:680px){.routes{grid-template-columns:1fr}}
+
+.substep{position:relative;padding-left:26px;margin-bottom:30px;border-left:2px solid var(--line-2)}
+.substep:last-child{margin-bottom:0}
+.substep::before{content:"";position:absolute;left:-8px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--abyss);border:2px solid var(--gold)}
+.ss-tag{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.04em}
+.ss-title{font-family:"Sora","Noto Sans SC",sans-serif;font-size:19px;font-weight:600;margin:4px 0 12px}
+.ss-title .opt{font-size:12px;font-weight:400;color:var(--faint);font-family:"JetBrains Mono",monospace;border:1px solid var(--line-2);border-radius:20px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+.ss-title .key{font-size:11px;font-weight:700;color:var(--gold);font-family:"JetBrains Mono",monospace;background:var(--gold-dim);border-radius:20px;padding:2px 10px;margin-left:8px;vertical-align:middle}
+.substep p{font-size:14.5px;color:var(--muted);margin-bottom:12px;line-height:1.7}
+.substep p b{color:var(--text);font-weight:600}
+.substep ul{list-style:none;margin:0 0 14px;display:grid;gap:8px}
+.substep ul li{font-size:14px;color:var(--muted);padding-left:18px;position:relative;line-height:1.62}
+.substep ul li::before{content:"▸";position:absolute;left:0;color:var(--cobalt)}
+.substep ul li b{color:var(--text)}
+
+.recipe{background:#0A0F1C;border:1px solid var(--line-2);border-radius:11px;overflow:hidden;margin:0 0 14px}
+.recipe-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(245,194,78,.07);border-bottom:1px solid var(--line)}
+.recipe-label{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.recipe-label::before{content:"▦";color:var(--gold)}
+.recipe table{width:100%;border-collapse:collapse}
+.recipe td{padding:9px 14px;font-size:13px;border-bottom:1px solid rgba(110,150,220,.08);vertical-align:top}
+.recipe tr:last-child td{border-bottom:none}
+.recipe td.k{font-family:"JetBrains Mono",monospace;color:var(--cobalt);white-space:nowrap;width:38%}
+.recipe td.v{color:var(--text)}.recipe td.v em{color:var(--faint);font-style:normal;font-size:12px}
+
+.call{border-radius:11px;padding:15px 18px;margin:0 0 14px;font-size:14px;line-height:1.65;display:flex;gap:13px;align-items:flex-start}
+.call .ci{flex-shrink:0;font-size:16px;line-height:1.4}
+.call.tip{background:var(--cobalt-dim);border:1px solid var(--line-2)}.call.tip b{color:var(--cobalt)}
+.call.warn{background:var(--gold-dim);border:1px solid rgba(245,194,78,.3)}.call.warn b{color:var(--gold)}
+.call.rule{background:var(--glow-dim);border:1px solid rgba(55,225,255,.28)}.call.rule b{color:var(--glow)}
+.call span{color:var(--text)}.call span b{font-weight:600}
+
+.pit{display:grid;gap:9px}
+.pit div{display:grid;grid-template-columns:auto 1fr;gap:12px;font-size:14px;color:var(--muted);background:var(--red-dim);border:1px solid rgba(240,104,91,.22);border-radius:9px;padding:12px 15px;line-height:1.55}
+.pit div::before{content:"✕";color:var(--red);font-weight:700}.pit div b{color:var(--text);font-weight:600}
+
+.check{display:grid;gap:9px;margin-bottom:18px}
+.ci-row{display:flex;align-items:flex-start;gap:13px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 16px;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.ci-row:hover{border-color:var(--line-2)}
+.ci-box{flex-shrink:0;width:21px;height:21px;border-radius:6px;border:2px solid var(--line-2);margin-top:1px;transition:background .2s,border-color .2s;position:relative}
+.ci-row.done .ci-box{background:var(--green);border-color:var(--green)}
+.ci-row.done .ci-box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #0A0F1C;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.ci-text{font-size:14.5px;color:var(--text)}
+.ci-row.done .ci-text{color:var(--muted);text-decoration:line-through}
+.ci-text small{display:block;color:var(--faint);font-size:12.5px;text-decoration:none;margin-top:2px}
+
+.selfcheck{background:linear-gradient(150deg,var(--surface),var(--night));border:1px solid var(--line);border-radius:14px;padding:24px 26px}
+.selfcheck h3{font-family:"Sora","Noto Sans SC",sans-serif;font-size:17px;margin-bottom:14px;color:var(--gold)}
+.selfcheck ol{margin:0 0 16px;padding-left:20px;display:grid;gap:9px}
+.selfcheck li{font-size:14.5px;color:var(--muted);line-height:1.6}.selfcheck li b{color:var(--text)}
+.selfcheck .pass{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--green)}
+
+/* pipeline recap */
+.recap{background:var(--night);border:1px solid var(--line);border-radius:16px;padding:26px 24px}
+.recap-step{display:grid;grid-template-columns:34px 1fr auto;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.recap-step:last-child{border-bottom:none}
+.recap-no{font-family:"JetBrains Mono",monospace;font-size:13px;font-weight:700;color:var(--faint)}
+.recap-name{font-family:"Sora","Noto Sans SC",sans-serif;font-size:15px;font-weight:600}
+.recap-name small{display:block;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);font-weight:400;margin-top:1px}
+.recap-tag{font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.t-ai{color:var(--glow);background:rgba(55,225,255,.12)}
+.t-mix{color:var(--cobalt);background:var(--cobalt-dim)}
+.t-paw{color:var(--gold);background:var(--gold-dim)}
+
+.finale{text-align:center;padding:20px 0 0}
+.finale svg{width:84px;height:84px;margin:0 auto 18px;display:block;filter:drop-shadow(0 8px 26px rgba(55,225,255,.2))}
+.finale h3{font-family:"Sora","Noto Sans SC",sans-serif;font-weight:800;font-size:clamp(22px,3.6vw,30px);margin-bottom:14px}
+.finale h3 .g{background:linear-gradient(100deg,var(--cobalt),var(--glow));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.finale p{color:var(--muted);font-size:15.5px;max-width:560px;margin:0 auto 14px}
+.finale p b{color:var(--text)}
+
+.lnav{display:flex;justify-content:space-between;gap:14px;padding:34px 0 10px;border-top:1px solid var(--line)}
+.lnav a{flex:1;display:flex;flex-direction:column;gap:4px;text-decoration:none;padding:18px 22px;border-radius:13px;border:1px solid var(--line);background:var(--surface);transition:transform .15s,border-color .2s}
+.lnav a:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.lnav a.next{background:linear-gradient(150deg,rgba(245,194,78,.08),var(--surface));border-color:rgba(245,194,78,.3);text-align:right}
+.lnav .ln-k{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--faint);letter-spacing:.1em}
+.lnav .ln-v{font-family:"Sora","Noto Sans SC",sans-serif;font-size:16px;font-weight:600;color:var(--text)}
+.lnav a.next .ln-v{color:var(--gold)}
+@media(max-width:560px){.lnav{flex-direction:column}}
+
+footer{border-top:1px solid var(--line);padding:30px 0 50px;position:relative;z-index:1}
+footer .fm{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.8}
+footer a{color:var(--muted);text-decoration:none}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}.lnav a:hover{transform:none}.blink{animation:none!important}}
+.blink{animation:blink 5.5s infinite}
+@keyframes blink{0%,93%,100%{opacity:1}96%{opacity:.15}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="catGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6E8CFF"/><stop offset="1" stop-color="#3457D6"/></linearGradient>
+  <filter id="eyeGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <g id="bluecat">
+    <path d="M55,72 L45,20 L100,52 Z" fill="url(#catGrad)"/><path d="M205,72 L215,20 L160,52 Z" fill="url(#catGrad)"/>
+    <path d="M64,64 L58,34 L88,52 Z" fill="#2C3F8F"/><path d="M196,64 L202,34 L172,52 Z" fill="#2C3F8F"/>
+    <path d="M62,74 C62,50 92,42 130,42 C168,42 198,50 198,74 C200,98 196,150 170,178 C152,196 138,200 130,200 C122,200 108,196 90,178 C64,150 60,98 62,74 Z" fill="url(#catGrad)"/>
+    <g class="blink" filter="url(#eyeGlow)">
+      <ellipse cx="103" cy="106" rx="15" ry="20" fill="#F5C24E"/><ellipse cx="157" cy="106" rx="15" ry="20" fill="#F5C24E"/>
+      <ellipse cx="103" cy="106" rx="4.2" ry="15" fill="#1a1206"/><ellipse cx="157" cy="106" rx="4.2" ry="15" fill="#1a1206"/>
+      <circle cx="99" cy="99" r="3" fill="#fff" opacity=".85"/><circle cx="153" cy="99" r="3" fill="#fff" opacity=".85"/>
+    </g>
+    <path d="M130,140 L139,151 L121,151 Z" fill="#F2ECDF"/>
+    <path d="M130,151 Q124,160 115,155 M130,151 Q136,160 145,155" stroke="#0F1626" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <g stroke="#BBD0FF" stroke-width="1.6" stroke-linecap="round" opacity=".5">
+      <path d="M88,142 L42,134"/><path d="M88,150 L44,152"/><path d="M88,158 L48,168"/>
+      <path d="M172,142 L218,134"/><path d="M172,150 L216,152"/><path d="M172,158 L212,168"/></g>
+  </g>
+</defs></svg>
+
+<nav><div class="nav-in">
+  <a href="#" class="brand"><svg viewBox="0 0 260 240"><use href="#bluecat"/></svg>蓝猫 3D</a>
+  <a href="#" class="nav-back">← 返回九步产线</a>
+</div></nav>
+
+<div class="prog"><div class="prog-in">
+  <div class="prog-bars"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="cur"></i></div>
+  <div class="prog-label"><b>09</b> / 09</div>
+</div></div>
+
+<header class="lhead">
+  <div class="wrap">
+    <div class="crumb"><a href="#">蓝猫 3D</a> / <a href="#">九步产线</a> / 模块 09</div>
+    <div class="mod-badge">Module 09 · Export ⚡ AI 提速</div>
+    <h1 class="ltitle">导出到引擎</h1>
+    <p class="lobjective">把绑定好的角色送进 <b>Unity 6 / Unreal Engine 5</b>，核对比例、材质、动画，做最终验收。走完这一步，你手里就是一个<b>真正能进游戏、能进作品集的成品角色</b>——产线闭环。</p>
+    <div class="meta-row">
+      <div class="meta"><span class="mk">时长</span><span class="mv">30–90 分钟</span></div>
+      <div class="meta"><span class="mk">难度</span><span class="mv ai">⚡ AI 提速</span></div>
+      <div class="meta"><span class="mk">工具</span><span class="mv">Unity 6 · UE5 · Blender</span></div>
+      <div class="meta"><span class="mk">交付物</span><span class="mv">引擎里的成品角色</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- WHAT -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 01 · 这一步在做什么</div>
+    <h2 class="sh">终点线：进引擎，验收，交付</h2>
+    <div class="handoff"><span class="hi">🔗</span><span><b>承接模块 08：</b>你有了绑定 + 动画的角色，现在把它搬进游戏引擎里跑起来。</span></div>
+    <p class="tx">这步技术不难，<b>但最容易出"经典惨案"</b>：拖进引擎一看——<span class="hl">贴图全没了、比例大成巨人、角色脸朝地</span>。这些不是你的模型坏了，是<b>制作软件和引擎的数据约定对不上</b>。这一步就是把这些对接好。</p>
+  </div>
+</section>
+
+<!-- FORMAT -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 02 · 选格式</div>
+    <h2 class="sh">GLB 还是 FBX？这关系到材质能不能活</h2>
+    <div class="routes">
+      <div class="route best">
+        <div class="route-top"><span class="route-name">GLB / glTF</span><span class="route-tag">材质最稳</span></div>
+        <p><b>原生携带 metallic-roughness PBR</b>，底色+金属+粗糙+法线一把过，单文件含贴图。Unity/UE/Godot/Web 都吃。角色优先试它。</p>
+        <p class="meta-line">PBR 材质干净过去</p>
+      </div>
+      <div class="route">
+        <div class="route-top"><span class="route-name">FBX</span><span class="route-tag">骨骼最稳</span></div>
+        <p>引擎标准（尤其骨骼动画兼容性最好），但<b>诞生在 PBR 之前</b>——金属/粗糙/法线常被丢，往往只可靠传底色，要手动重接贴图。</p>
+        <p class="meta-line">骨骼动画首选 · 材质手动接</p>
+      </div>
+    </div>
+    <div class="call rule"><span class="ci">🔑</span><span><b>头号惨案根源</b>就是格式：通过 FBX 导 PBR，金属/粗糙经常掉。<b>带骨骼动画的角色，先试 GLB（材质+骨架+动画一把过）；遇到骨骼兼容问题再退回 FBX，材质手动接。</b></span></div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 03 · 逐道工序</div>
+    <h2 class="sh">从导出，到引擎里站稳</h2>
+
+    <div class="substep">
+      <div class="ss-tag">9.1</div>
+      <div class="ss-title">导出设置</div>
+      <ul>
+        <li><b>应用所有变换</b>（位置/旋转/缩放归一），再导出。</li>
+        <li>核对<b>坐标轴</b>：Blender 是 Z 向上，多数引擎是 Y 向上——导出时设对 Forward/Up，免得"脸朝地"。</li>
+        <li>勾选<b>嵌入贴图</b>（GLB 自带）；FBX 单独带 textures 文件夹。</li>
+        <li>骨骼动画：确认导出含 Armature + 动画轨道。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.2</div>
+      <div class="ss-title">导入引擎 <span class="key">关掉重算</span></div>
+      <ul>
+        <li>拖进 <b>Unity 6</b>（源文件留在 Assets，引擎转内部格式）或 <b>UE5</b> 的 Content。</li>
+        <li><b>关掉 Recompute Normals / Recompute Tangents</b>——你在模块 06 烘的法线才不会被引擎覆盖掉。</li>
+        <li>记得把 textures 文件夹一起导入。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.3</div>
+      <div class="ss-title">修比例与朝向</div>
+      <ul>
+        <li><b>单位差异</b>：Unity 1 单位 = 1 米；UE 1 单位 = 1 厘米。比例不对就调 Scale Factor / 导入缩放。</li>
+        <li>对照参考：人形角色大概 <b>1.8 米</b>高，别成巨人或蚂蚁。</li>
+        <li>朝向不对（脸朝地、躺着）= 坐标轴没对上，回 9.1 重设导出轴。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.4</div>
+      <div class="ss-title">接材质 <span class="key">色彩空间</span></div>
+      <ul>
+        <li>把 07 的 PBR 贴图接到引擎的 <b>metallic-roughness</b> 材质（GLB 通常自动接好）。</li>
+        <li><b>色彩空间要对</b>：底色/自发光是 <b>sRGB</b>；法线/粗糙/金属/AO 是<b>线性（非彩色）</b>。接反了会发灰发暗。</li>
+        <li>留意<b>通道打包差异</b>：Unity 和 UE 对金属/AO/粗糙的打包方式不同，必要时重打包。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.5</div>
+      <div class="ss-title">接骨架与动画</div>
+      <ul>
+        <li>导入为 <b>Skeletal Mesh</b>（UE）/ 设置 <b>Humanoid Avatar</b>（Unity）。</li>
+        <li>模块 08 把骨骼命名规范化的功夫，<b>这里兑现</b>：动画能直接<b>重定向（retarget）</b>，不用重做。</li>
+        <li>播一遍动画，确认形变和导出前一致。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.6</div>
+      <div class="ss-title">LOD 与碰撞 <span class="opt">看用途</span></div>
+      <ul>
+        <li><b>进游戏</b>：生成 LOD（远处用低面版本省性能），按需加碰撞体。</li>
+        <li><b>纯作品集展示</b>：这步可跳过，重点放在打光和渲染。</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="ss-tag">9.7</div>
+      <div class="ss-title">最终验收 + 出片</div>
+      <ul>
+        <li>放进<b>打了光的场景</b>，绕一圈看材质在真实光照下对不对。</li>
+        <li>播动画 + 拉远看，确认形变干净、剪影立得住。</li>
+        <li><b>出作品集</b>：录一段转盘（turntable）+ 待机/走路动画，配几张静帧。这就是你的成品。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ENGINE COMPARE -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 04 · 引擎速查</div>
+    <h2 class="sh">Unity 6 vs UE5 关键差异</h2>
+    <div class="recipe">
+      <div class="recipe-bar"><span class="recipe-label">两引擎 · 核对清单</span></div>
+      <table>
+        <tr><td class="k">单位</td><td class="v">Unity 1 单位=1m · UE 1 单位=1cm</td></tr>
+        <tr><td class="k">首选格式</td><td class="v">两者都吃 FBX/GLB · 角色材质优先 GLB</td></tr>
+        <tr><td class="k">导入法线</td><td class="v">都要关 Recompute Normals/Tangents</td></tr>
+        <tr><td class="k">材质</td><td class="v">都用 metallic-roughness PBR · 核对色彩空间</td></tr>
+        <tr><td class="k">动画重定向</td><td class="v">Unity Humanoid Avatar · UE IK Rig Retarget</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- DISCIPLINE -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 05 · 关键纪律</div>
+    <h2 class="sh">三条铁律</h2>
+    <div class="why">
+      <p><b>① 材质要活，优先 GLB。</b>FBX 丢 PBR 是头号惨案，带材质的角色先试 GLB。</p>
+      <p><b>② 关掉法线重算。</b>否则引擎会覆盖你辛苦烘的法线，前功尽弃。</p>
+      <p><b>③ 色彩空间分清楚。</b>底色/自发光 sRGB，其余线性——接反了整个角色发灰。</p>
+    </div>
+  </div>
+</section>
+
+<!-- PITFALLS -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 06 · 常见翻车</div>
+    <h2 class="sh">导入三大经典惨案</h2>
+    <div class="pit">
+      <div><span><b>贴图全没了</b> → FBX 丢了 PBR，改用 GLB 或手动接图。</span></div>
+      <div><span><b>比例成巨人/蚂蚁</b> → 单位差异，调 Scale Factor。</span></div>
+      <div><span><b>角色脸朝地/躺着</b> → 坐标轴没对上，重设导出 Forward/Up。</span></div>
+      <div><span><b>法线发蓝、表面诡异</b> → 没关重算 / 切线空间不一致（回 06 核对）。</span></div>
+      <div><span><b>整个角色发灰发暗</b> → 色彩空间接反（法线/粗糙误设 sRGB）。</span></div>
+      <div><span><b>动画没法重定向</b> → 骨骼命名不规范（回 08 改名）。</span></div>
+      <div><span><b>性能卡顿</b> → 没做 LOD，远处还在跑满面数。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 07 · 本节交付物</div>
+    <h2 class="sh">勾完这些，你就毕业了</h2>
+    <div class="check">
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">角色在引擎里：比例对、朝向对<small>~1.8m，站在地面，正面朝前</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">材质在真实光照下正确<small>金属反光、布料哑、无发灰</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">动画能播、能重定向<small>形变和导出前一致</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">一段作品集展示<small>转盘 + 待机/走路 + 静帧</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">整套工程文件归档<small>→ 09_engine，九步全程留档</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SELF CHECK -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 08 · 终极自检</div>
+    <div class="selfcheck">
+      <h3>🐾 三问，全过即出师</h3>
+      <ol>
+        <li>在打光场景里绕一圈，<b>材质、比例、朝向都对</b>吗？</li>
+        <li>播动画，<b>形变干净、剪影立得住</b>吗？</li>
+        <li>你能<b>录一段转盘 + 动画</b>放进作品集了吗？</li>
+      </ol>
+      <p class="pass">▸ 三个都过 → 恭喜，你的角色从概念走到了引擎。🐾</p>
+    </div>
+  </div>
+</section>
+
+<!-- PIPELINE RECAP -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 终 · 整条产线回顾</div>
+    <h2 class="sh">九步，一条线，你都走完了</h2>
+    <div class="recap">
+      <div class="recap-step"><span class="recap-no">01</span><span class="recap-name">概念设定<small>AI 出多视图参考</small></span><span class="recap-tag t-ai">⚡ AI</span></div>
+      <div class="recap-step"><span class="recap-no">02</span><span class="recap-name">3D 模型生成<small>图生 base mesh</small></span><span class="recap-tag t-ai">⚡ AI</span></div>
+      <div class="recap-step"><span class="recap-no">03</span><span class="recap-name">雕刻<small>清理修形、定剪影</small></span><span class="recap-tag t-paw">🐾 带练</span></div>
+      <div class="recap-step"><span class="recap-no">04</span><span class="recap-name">重拓扑与优化<small>干净低模 + 环线</small></span><span class="recap-tag t-paw">🐾 带练</span></div>
+      <div class="recap-step"><span class="recap-no">05</span><span class="recap-name">UV 展开<small>摊平、藏缝线、统一密度</small></span><span class="recap-tag t-mix">◐ 手修</span></div>
+      <div class="recap-step"><span class="recap-no">06</span><span class="recap-name">纹理烘焙<small>高模细节 → 法线等贴图</small></span><span class="recap-tag t-mix">◐ 手修</span></div>
+      <div class="recap-step"><span class="recap-no">07</span><span class="recap-name">上色 + 材质<small>AI 底色 + 手修 PBR</small></span><span class="recap-tag t-mix">◐ 手修</span></div>
+      <div class="recap-step"><span class="recap-no">08</span><span class="recap-name">绑定 + 动画<small>自动绑 + 修权重</small></span><span class="recap-tag t-paw">🐾 带练</span></div>
+      <div class="recap-step"><span class="recap-no">09</span><span class="recap-name">导出到引擎<small>进 Unity / UE5,闭环</small></span><span class="recap-tag t-ai">⚡ AI</span></div>
+    </div>
+
+    <div class="finale">
+      <svg viewBox="0 0 260 240"><use href="#bluecat"/></svg>
+      <h3>从一张草图，到<span class="g">能进引擎的角色</span></h3>
+      <p>慢工序你交给了 AI，手艺活你亲手练过了。<b>这条产线，现在长在你身上了</b>——它不会随某个工具过时，因为你懂的是整条线的逻辑。</p>
+      <p>下一步：<b>拿这套流程，做你自己的第二个、第三个角色</b>。越做越快，越做越像你。🐾</p>
+    </div>
+  </div>
+</section>
+
+<!-- LESSON NAV -->
+<div class="wrap">
+  <div class="lnav">
+    <a href="#"><span class="ln-k">← 上一节</span><span class="ln-v">模块 08 · 绑定 + 动画</span></a>
+    <a class="next" href="#"><span class="ln-k">完成 ✦</span><span class="ln-v">返回九步产线总览</span></a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap"><div class="fm">蓝猫 AI × 3D 角色产线 · 模块 09 / 09 · 全九步完结<br>© 2026 蓝猫 BlueCat · <a href="https://bluecatbot.com">bluecatbot.com</a></div></div>
+</footer>
+
+<script>
+  function tk(row){row.classList.toggle('done')}
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

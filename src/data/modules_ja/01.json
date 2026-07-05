@@ -1,0 +1,202 @@
+{
+  "num": "01",
+  "title": "コンセプト設定",
+  "badge": "Module 01 · Concept ⚡ AI高速",
+  "objective": "AI が正確に 3D 化できる、クリーンな 2D リファレンスを一式つくる。確定した正面図 1 枚 + マルチビュー（理想は側面 / 背面 / 3-4 ビュー）+ 任意でパーツ分解図。この一式が後続 8 ステップの土台になる——リファレンスがクリーンなほど、3D キャラもクリーンに仕上がる。",
+  "meta": [
+    { "k": "所要時間", "v": "45〜90 分" },
+    { "k": "難易度", "v": "⚡ AI高速" },
+    { "k": "ツール", "v": "ChatGPT · Nano Banana Pro" },
+    { "k": "成果物", "v": "A ポーズ・マルチビュー参考セット" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · なぜここで勝負が決まるのか",
+      "h2": "下流の画像 → 3D は「ゴミを入れればゴミが出る」",
+      "paras": [
+        "Meshy や Tripo のような画像 → 3D ツールは、投げ込んだリファレンス画像をほぼそのまま食う。リファレンスがクリーンなほど、出てくるメッシュもクリーンになる。"
+      ],
+      "box": [
+        "ドラマチックな光、ダイナミックなポーズ、賑やかな背景の「見栄えのいいイラスト」は、3D ジェネレーターにかけると溶けたジオメトリの塊になる——脇が癒着し、比率が崩れ、背景までメッシュに取り込まれる。",
+        "だからこのステップの目標は、きれいに描くことではなく「機械が読み取れるように描く」こと。ここに注ぐ 1 分は、後続 8 ステップで何倍にもなって返ってくる。"
+      ]
+    },
+    {
+      "type": "rules",
+      "snum": "/ 02 · 画像 → 3D の 5 つの鉄則",
+      "h2": "リファレンスはこの 5 つを同時に満たすこと",
+      "intro": "以下の工程はすべて、最終リファレンスをこの 5 条件に合わせるためにある。まずルールを頭に叩き込んでから手を動かそう。",
+      "rules": [
+        { "h4": "A ポーズ / T ポーズ · 四肢を離す", "p": "腕を胴体に密着させると、ジェネレーターは腕と体を区別できず、脇が癒着する。A ポーズ（腕を 30〜45° 下ろす）は T ポーズより安定しやすく、手首が太ももにめり込むこともない。" },
+        { "h4": "ニュートラルな平面光 · 強い影なし", "p": "ドラマチックな光やリムライトはジオメトリとテクスチャに焼き込まれ、3D になってからは直せない。欲しいのは均一なスタジオの柔らかい光だ。" },
+        { "h4": "単色背景 · 小道具・シーンなし", "p": "純白か純グレーで、地面・影・小道具はなし。背景がクリーンなほど切り抜きも生成も正確になる。そうでないと背景ごとモデリングされてしまう。" },
+        { "h4": "正投影の視点 · パースの圧縮なし", "p": "アオリや俯瞰をつけず正面から。パースがつくとジェネレーターが比率を誤認する——頭でっかち、足ちんまり、遠近がぐちゃぐちゃになる。" },
+        { "h4": "マルチビューで一貫 · 同一キャラ", "p": "正面 / 側面 / 背面が同一人物：同じ配色、同じ装備、同じ比率。ここが AI にとって最難関であり、本節の主戦場——一貫性モデル + リファレンス入力で解決する。" }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 03 · 工程を順に",
+      "h2": "一言のアイデアから、規格を満たすリファレンス一式へ",
+      "intro": null,
+      "substeps": [
+        {
+          "tag": "1.1",
+          "title": "コンセプト固め · まず文章でキャラを固定する",
+          "opt": null,
+          "paras": [
+            "いきなりガチャを回さない。まず ChatGPT で「設定」を言語化する：一言コンセプト、シルエットの特徴、配色、象徴的なディテール。文章が明確なほど、画像は出しやすく一貫する。下の構造化プロンプトをそのまま使おう。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "コンセプト · ChatGPT",
+              "text": "You are a senior character designer for a stylized 3D action game.\nLock a production-ready character concept from my seed idea. Output:\n1. One-paragraph concept (who they are, their world)\n2. Silhouette features (what makes them readable as a black shape)\n3. Color palette: 3-4 hex colors with roles (primary / secondary / accent)\n4. 5 distinctive design details (gear, marks, materials)\n5. A ready-to-paste FRONT-VIEW image prompt: full-body, A-pose,\n   plain white background, neutral studio lighting.\n\nSeed idea: [你的一句话点子，例如 a wandering blue-cat spirit swordsman]\nKeep it production-oriented: clean silhouette, separable parts,\nno extreme anatomy that is hard to model."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "なぜ：先に文章設定を作っておけば、以降の画像生成で毎回同じ記述を引用でき、マルチビューの一貫性を守る第一の保険になる。" }
+          ]
+        },
+        {
+          "tag": "1.2",
+          "title": "正面図 master を出す · 以降すべてのビューの真実の源",
+          "opt": null,
+          "paras": [
+            "構造化プロンプトで正面図を生成する。一度に複数枚出し、シルエットが最も強く設定に最も合う 1 枚を選ぶ。構造は常に：主体 + スタイル + ポーズ + 構図 + ライティング + 背景。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "正面図 master · テキスト → 画像",
+              "text": "full-body character concept of [角色描述], front orthographic view,\nA-pose with arms held ~35° away from the body, legs slightly apart,\ncharacter reference sheet, flat even studio lighting, soft shadows only,\nplain solid white background, clean readable design, [STYLE],\nsymmetrical, entire figure visible head to feet, no cropping,\nhigh detail, sharp focus\n\navoid: dramatic lighting, rim light, busy background, props, ground shadow,\naction pose, foreshortening, extreme perspective, multiple characters,\ntext, watermark, cropped limbs"
+            }
+          ],
+          "calls": [
+            { "type": "rule", "text": "シルエットテスト：選んだ画像を真っ黒なシルエットにして、一目で誰か分かるか？分からない → デザインが弱い、引き直し。見栄えがいい ≠ 読み取れる。" }
+          ]
+        },
+        {
+          "tag": "1.3",
+          "title": "確定・クリーンアップ · master を仕上げる",
+          "opt": null,
+          "paras": [
+            "1 枚を選んだら、画像編集でクリーンに仕上げ、そこで固定してデザインはもう変えない。これがあなたの master になる。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "クリーンアップ確定 · 画像 → 画像編集",
+              "text": "Using this image, keep the EXACT same character design, outfit and colors.\nClean it up only:\n- remove the background to pure white\n- complete any cropped limbs so the full body (head to feet) is visible\n- flatten dramatic lighting into even neutral studio light\n- correct obvious proportion issues\nA-pose, front orthographic view. Do not redesign anything."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.4",
+          "title": "ターンアラウンド / マルチビュー · 一貫性モデルで master から派生",
+          "opt": null,
+          "paras": [
+            "コアテクニック：master をリファレンス画像として Nano Banana Pro（Gemini 3 Pro Image）に食わせる——その真骨頂こそ「キャラの同一性ロック、画像をまたいだ一貫性の維持」で、最大 14 枚までリファレンスを渡せる。視点だけ変えてデザインは変えさせない。"
+          ],
+          "bullets": [
+            "1 枚でターンアラウンド（シンプルなキャラ）：1 枚の中に正面 / 側面 / 背面の三面を出し、同じ高さで揃える。",
+            "1 枚ずつ派生（複雑なキャラ）：視点ごとに生成し、毎回 master + 確定済みビューを一緒に渡してリファレンスにすると、一貫性がより安定する。"
+          ],
+          "prompts": [
+            {
+              "label": "側面 / 背面派生 · Nano Banana Pro",
+              "text": "Use the provided reference image as the single source of truth for this\ncharacter. Generate the SAME character in a [side profile / back]\northographic view. Keep identical outfit, colors, proportions, gear and\ndesign details - this must read as the EXACT same character, just rotated.\nA-pose, flat neutral studio lighting, plain white background,\ncharacter turnaround sheet style. Do not change or add any design element."
+            },
+            {
+              "label": "一度に三面図 · turnaround",
+              "text": "Create a character turnaround / model sheet of THIS exact character showing\nfront, side and back views in a row. All A-pose, identical design and colors,\nflat neutral lighting, plain white background, evenly aligned at the same\nheight and scale."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "Thinking モードを有効に：Nano Banana Pro の推論モードは先にラフを生成してから仕上げるので、複雑なキャラの一貫性が明らかに安定する。それでも一貫性がブレる？生成済みのビューもリファレンス入力に加え、より多くの「アンカー」を与えよう。" }
+          ]
+        },
+        {
+          "tag": "1.5",
+          "title": "パーツ分解 · 個別に生成できるパーツを切り出す",
+          "opt": "複雑なキャラのみ必要",
+          "paras": [
+            "武器、ヘルメット、マント、大型のアクセサリーなどは、個別に切り抜いて純白背景・正投影にする。あとでより高品質に単体で 3D 生成してから組み立てる——複雑なキャラを丸ごと無理やり生成するより、はるかにクリーンだ。分けられるなら分ける。"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "パーツ抽出 · 画像 → 画像",
+              "text": "Isolate the [weapon / helmet / cape] from this character.\nShow it ALONE on a plain white background, orthographic front and side\nviews, clean even studio lighting, no character, no background props,\nproduct-shot style, high detail."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.6",
+          "title": "納品整理 · 命名、位置合わせ、アーカイブ",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "解像度と構図を統一し、画面内のキャラのサイズを揃えて、後でビューごとに比較しやすくする。",
+            "命名規則：char_front / char_side / char_back / char_3q / part_weapon…",
+            "01_concept フォルダを作り、一式をアーカイブする。これがモジュール 02 への入力パッケージになる。"
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 04 · スタイル分岐",
+      "h2": "同じルールで、3 スタイルを微調整",
+      "branches": [
+        { "name": "🛡️ リアル / セミリアル", "p": "ルールはそのまま、プロンプトにスタイル語を足すだけ。3D 生成に最も優しいタイプ。", "code": "semi-realistic game character, PBR-friendly, neutral expression, balanced anatomy" },
+        { "name": "✨ 二次元 / アニメ", "p": "注意：大きな目や誇張した比率は 3D 生成を難しくする。シルエットはより抑え気味に。", "code": "anime style, cel-shaded, clean lineart, flat colors, readable silhouette" },
+        { "name": "🐱 カートゥーン / デフォルメ", "p": "比率は誇張してよいが、四肢はきっちり離しシルエットを明快に。さもないと丸っこい塊が癒着する。", "code": "chibi / stylized cartoon, exaggerated proportions, separated limbs, bold shapes" }
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 05 · よくある失敗",
+      "h2": "この落とし穴、初心者の 80% がハマる",
+      "items": [
+        "ドラマチック光 / 逆光を使った → 影が焼き付き、3D 段階で直せない。",
+        "ダイナミックなポーズ（走る、剣を振る） → 標準比率が読み取れず、手足が癒着する。",
+        "パースが強すぎる → 比率が崩れ、頭でっかち足ちんまり。",
+        "マルチビューをバラバラに描いた → 正面・側面・背面が別人になり、後で組み合わせられない。",
+        "背景に小道具 / 地面がある → 背景ごとメッシュに取り込まれる。",
+        "超複雑なキャラを一発で無理やり生成 → ディテールがぐしゃぐしゃ。分けるべきは分ける。",
+        "見栄えがよくて止めた → シルエットテストをしていない、見栄えがいい ≠ 読み取れる。"
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 06 · 本節の成果物",
+      "h2": "これを全部チェックできて、初めて合格",
+      "items": [
+        { "text": "確定した正面図 1 枚", "small": "A ポーズ / ニュートラル光 / 純白背景 / 正投影" },
+        { "text": "背面図 少なくとも 1 枚", "small": "同一キャラ、配色 / 装備 / 比率が一致" },
+        { "text": "理想：+ 側面図 + 3/4 ビュー", "small": "ビューが揃うほど、モジュール 02 の生成が正確になる" },
+        { "text": "複雑なキャラ：パーツ分解図 数枚", "small": "武器 / ヘルメット / マント、純白背景・正投影" },
+        { "text": "すべて命名して 01_concept にアーカイブ", "small": "これが次ステップへの入力パッケージ" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 07 · 次ステップに進む前のセルフチェック",
+      "title": "🐾 三問、全部通ったらゴー",
+      "questions": [
+        "どれか 1 枚を黒シルエットにして、まだキャラだと分かるか？",
+        "正面 / 側面 / 背面を並べて、同一人物か（配色 / 装備 / 比率）？",
+        "強い影、パース、賑やかな背景がまだ残っていないか？"
+      ],
+      "pass": "▸ 三つとも通過 → モジュール 02：3D モデル生成へ。"
+    }
+  ],
+  "prev": null,
+  "next": null
+}

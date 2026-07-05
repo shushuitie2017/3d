@@ -1,0 +1,202 @@
+{
+  "num": "01",
+  "title": "Concept Design",
+  "badge": "Module 01 · Concept ⚡ AI-fast",
+  "objective": "Produce a clean set of 2D references that AI can accurately turn into 3D: one finalized front view + a multi-view turnaround (ideally side / back / 3-4 views) + optional part breakouts. These images are the foundation for the next 8 steps — the cleaner they are, the cleaner your 3D character will be.",
+  "meta": [
+    { "k": "Time", "v": "45–90 min" },
+    { "k": "Difficulty", "v": "⚡ AI-fast" },
+    { "k": "Tools", "v": "ChatGPT · Nano Banana Pro" },
+    { "k": "Deliverable", "v": "A-pose multi-view reference set" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · Why this step makes or breaks you",
+      "h2": "Downstream image-to-3D is \"garbage in, garbage out\"",
+      "paras": [
+        "Image-to-3D tools like Meshy and Tripo feed almost entirely on the reference you give them. The cleaner your reference, the cleaner the mesh that comes out."
+      ],
+      "box": [
+        "A \"pretty illustration\" with dramatic lighting, a dynamic pose, and a busy background becomes a blob of melted geometry in a 3D generator's hands — armpits fused, proportions warped, and the background baked into the mesh too.",
+        "So the goal of this step isn't to paint something beautiful, it's to paint something \"a machine can read.\" Every minute you invest here pays back many times over across the next 8 steps."
+      ]
+    },
+    {
+      "type": "rules",
+      "snum": "/ 02 · The 5 hard rules of image-to-3D",
+      "h2": "Your reference must satisfy all 5 at once",
+      "intro": "Every operation below exists to make your final reference satisfy these 5 rules. Burn the rules into memory first, then start.",
+      "rules": [
+        { "h4": "A-pose / T-pose · limbs separated", "p": "With arms tight against the torso, the generator can't tell arm from body and the armpits fuse. An A-pose (arms hanging 30–45° out) is usually more stable than a T-pose, and the wrists are less likely to clip into the thighs." },
+        { "h4": "Neutral flat light · no harsh shadows", "p": "Dramatic and rim lighting get baked straight into the geometry and textures, and once in 3D you can't remove them. What you want is even, soft studio light." },
+        { "h4": "Solid-color background · no scenery or props", "p": "Pure white or pure gray, no ground, no cast shadow, no props. The cleaner the background, the more accurate the cutout and generation — otherwise the background gets modeled right along with the character." },
+        { "h4": "Orthographic view · no perspective compression", "p": "Eye level, no strong high or low angles. Perspective makes the generator misjudge proportions — big head, small feet, near-large-far-small, all thrown off." },
+        { "h4": "Multi-view consistency · one and the same character", "p": "Front / side / back are the same person: same colors, same gear, same proportions. This is the hardest thing for AI and the core battleground of this section — solved with a consistency model + reference inputs." }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 03 · Step by step",
+      "h2": "From a one-line idea to a compliant reference set",
+      "intro": null,
+      "substeps": [
+        {
+          "tag": "1.1",
+          "title": "Concept · nail the character down in words first",
+          "opt": null,
+          "paras": [
+            "Don't start pulling the slot machine right away. First use ChatGPT to write the \"design\" out clearly: a one-line concept, silhouette features, color palette, signature details. The clearer the words, the easier and more consistent the images. Just drop in the structured prompt below:"
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Concept · ChatGPT",
+              "text": "You are a senior character designer for a stylized 3D action game.\nLock a production-ready character concept from my seed idea. Output:\n1. One-paragraph concept (who they are, their world)\n2. Silhouette features (what makes them readable as a black shape)\n3. Color palette: 3-4 hex colors with roles (primary / secondary / accent)\n4. 5 distinctive design details (gear, marks, materials)\n5. A ready-to-paste FRONT-VIEW image prompt: full-body, A-pose,\n   plain white background, neutral studio lighting.\n\nSeed idea: [你的一句话点子，例如 a wandering blue-cat spirit swordsman]\nKeep it production-oriented: clean silhouette, separable parts,\nno extreme anatomy that is hard to model."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "Why: once the design exists in words, every later generation can reference the same description — that's your first insurance for multi-view consistency." }
+          ]
+        },
+        {
+          "tag": "1.2",
+          "title": "Generate the front-view master · the source of truth for every other view",
+          "opt": null,
+          "paras": [
+            "Use a structured prompt to generate the front view, make a batch at once, and pick the one with the strongest silhouette that best matches the design. The structure is always: subject + style + pose + framing + light + background."
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Front-view master · text-to-image",
+              "text": "full-body character concept of [角色描述], front orthographic view,\nA-pose with arms held ~35° away from the body, legs slightly apart,\ncharacter reference sheet, flat even studio lighting, soft shadows only,\nplain solid white background, clean readable design, [STYLE],\nsymmetrical, entire figure visible head to feet, no cropping,\nhigh detail, sharp focus\n\navoid: dramatic lighting, rim light, busy background, props, ground shadow,\naction pose, foreshortening, extreme perspective, multiple characters,\ntext, watermark, cropped limbs"
+            }
+          ],
+          "calls": [
+            { "type": "rule", "text": "Silhouette test: turn your chosen image into a pure black silhouette — can you still tell who it is at a glance? If not → the design isn't strong enough, reroll. Good-looking ≠ readable." }
+          ]
+        },
+        {
+          "tag": "1.3",
+          "title": "Finalize and clean up · tidy the master",
+          "opt": null,
+          "paras": [
+            "Once you've picked one, use image editing to clean it up, then lock it — no more design changes. This is your master."
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Clean-up finalize · image-to-image edit",
+              "text": "Using this image, keep the EXACT same character design, outfit and colors.\nClean it up only:\n- remove the background to pure white\n- complete any cropped limbs so the full body (head to feet) is visible\n- flatten dramatic lighting into even neutral studio light\n- correct obvious proportion issues\nA-pose, front orthographic view. Do not redesign anything."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.4",
+          "title": "Turnaround / multi-view · derive from the master with a consistency model",
+          "opt": null,
+          "paras": [
+            "The core trick: feed the master as a reference image to Nano Banana Pro (Gemini 3 Pro Image) — its strength is exactly \"locking character identity and staying consistent across images,\" and it takes up to 14 reference images. Have it change only the viewing angle, never the design."
+          ],
+          "bullets": [
+            "Single-image turnaround (simple characters): front / side / back in one image, aligned to the same height.",
+            "One-by-one derivation (complex characters): generate each view individually, feeding the master + already-finalized views in as references each time for steadier consistency."
+          ],
+          "prompts": [
+            {
+              "label": "Side / back derivation · Nano Banana Pro",
+              "text": "Use the provided reference image as the single source of truth for this\ncharacter. Generate the SAME character in a [side profile / back]\northographic view. Keep identical outfit, colors, proportions, gear and\ndesign details - this must read as the EXACT same character, just rotated.\nA-pose, flat neutral studio lighting, plain white background,\ncharacter turnaround sheet style. Do not change or add any design element."
+            },
+            {
+              "label": "Three views at once · turnaround",
+              "text": "Create a character turnaround / model sheet of THIS exact character showing\nfront, side and back views in a row. All A-pose, identical design and colors,\nflat neutral lighting, plain white background, evenly aligned at the same\nheight and scale."
+            }
+          ],
+          "calls": [
+            { "type": "tip", "text": "Turn on Thinking mode: Nano Banana Pro's reasoning mode drafts first, then finalizes, and consistency on complex characters is noticeably steadier. Still drifting? Add the views you've already generated into the reference inputs to give it more \"anchors.\"" }
+          ]
+        },
+        {
+          "tag": "1.5",
+          "title": "Part breakout · split out separately generatable parts",
+          "opt": "only needed for complex characters",
+          "paras": [
+            "Things like weapons, helmets, capes, and large accessories: isolate them on a pure white background, orthographic. Later you generate each in higher quality as separate 3D and assemble — far cleaner than brute-forcing one whole complex character. Split whatever you can."
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Part extraction · image-to-image",
+              "text": "Isolate the [weapon / helmet / cape] from this character.\nShow it ALONE on a plain white background, orthographic front and side\nviews, clean even studio lighting, no character, no background props,\nproduct-shot style, high detail."
+            }
+          ],
+          "calls": []
+        },
+        {
+          "tag": "1.6",
+          "title": "Package the deliverable · name, align, archive",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Unify resolution and framing so the character is the same size in every frame, making view-by-view comparison easy later.",
+            "Naming convention: char_front / char_side / char_back / char_3q / part_weapon…",
+            "Create an 01_concept folder and archive the whole set. This is the input package for Module 02."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 04 · Style branches",
+      "h2": "Same rules, three style tweaks",
+      "branches": [
+        { "name": "🛡️ Realistic / semi-realistic", "p": "Rules unchanged, just add style words to the prompt. The friendliest category for 3D generation.", "code": "semi-realistic game character, PBR-friendly, neutral expression, balanced anatomy" },
+        { "name": "✨ Anime / cartoon", "p": "Watch out: big eyes and exaggerated proportions make 3D generation harder — keep the silhouette more restrained.", "code": "anime style, cel-shaded, clean lineart, flat colors, readable silhouette" },
+        { "name": "🐱 Toon / chibi", "p": "Proportions can be exaggerated, but the limbs must stay separated and the silhouette clear, or the rounded blob will fuse together.", "code": "chibi / stylized cartoon, exaggerated proportions, separated limbs, bold shapes" }
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 05 · Common wrecks",
+      "h2": "80% of beginners fall into these",
+      "items": [
+        "Using dramatic / backlight → shadows baked to death, unfixable in the 3D stage.",
+        "Dynamic pose (running, swinging a sword) → the generator can't read standard proportions, limbs fuse.",
+        "Too much perspective → warped proportions, big head, small feet.",
+        "Multi-views each drawn their own way → front/side/back aren't the same person, won't fit together later.",
+        "Props / ground in the background → the generator builds the background into the mesh too.",
+        "Brute-forcing an ultra-complex character in one go → details mush together; break out parts when you should.",
+        "Stopping once you roll something pretty → no silhouette test done, good-looking ≠ readable."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 06 · This section's deliverables",
+      "h2": "Only these ticked means you've passed",
+      "items": [
+        { "text": "1 finalized front view", "small": "A-pose / neutral light / pure white bg / orthographic" },
+        { "text": "At least 1 back view", "small": "same character, consistent colors / gear / proportions" },
+        { "text": "Ideal: + side view + 3/4 view", "small": "the more complete the views, the more accurate Module 02's generation" },
+        { "text": "Complex characters: a few part breakouts", "small": "weapon / helmet / cape, pure white bg, orthographic" },
+        { "text": "Everything named and archived into 01_concept", "small": "this is the input package for the next step" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 07 · Self-check before the next step",
+      "title": "🐾 Three questions — pass all to proceed",
+      "questions": [
+        "Turn any image into a black silhouette — can you still recognize the character?",
+        "Put front / side / back together — are they the same person (colors / gear / proportions)?",
+        "Any harsh shadows, perspective, or busy background not yet cleared?"
+      ],
+      "pass": "▸ All three pass → on to Module 02: 3D model generation."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

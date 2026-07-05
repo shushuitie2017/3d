@@ -1,0 +1,215 @@
+{
+  "num": "05",
+  "title": "UV Unwrap",
+  "badge": "Module 05 · UV Unwrap ◐ AI + hand-fix",
+  "objective": "Flatten the low-poly into a clean 2D map so textures land exactly where they should. It's the shared foundation for baking (06) and painting (07)—clean UVs make everything downstream easy; messy UVs mean seams and stretching everywhere.",
+  "meta": [
+    { "k": "Time", "v": "1–3 hours" },
+    { "k": "Difficulty", "v": "◐ AI + hand-fix" },
+    { "k": "Tools", "v": "Blender 4.5 LTS" },
+    { "k": "Deliverable", "v": "Clean unwrapped UVs" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "Cut the 3D open and flatten it into 2D",
+      "paras": [
+        "A UV is the map that ties a 3D surface to 2D image coordinates. Without it, textures warp, misalign, and smear into mush. This step sets up the next two:",
+        "Module 06 Baking: transfers high-poly detail onto the low-poly's texture, using UVs to place it.",
+        "Module 07 Painting: every PBR texture is painted on this UV map."
+      ],
+      "box": []
+    },
+    {
+      "type": "prose",
+      "snum": "/ 02 · Why redo it yourself",
+      "h2": "The UVs the AI hands you are basically garbage",
+      "paras": [],
+      "box": [
+        "Image-to-3D tools auto-generate a UV set—but it's usually shattered and uneditable, with islands scattered everywhere and uneven density. Hand-painting on it is a nightmare.",
+        "Luckily you already built a clean retopo low-poly back in Module 04. Re-unwrapping on that clean mesh is fast and controllable. Toss the old AI UVs and start fresh."
+      ]
+    },
+    {
+      "type": "rules",
+      "snum": "/ 03 · Three core concepts",
+      "h2": "Get these three and UVs stop being mysterious",
+      "intro": null,
+      "rules": [
+        { "h4": "Seam · where you cut", "p": "The 'scissor line' you mark by hand, telling Blender which edges to split the model along when flattening. Place seams well and it lays flat with no stretch." },
+        { "h4": "Island · a flattened piece", "p": "After splitting along seams, each flat patch is a UV island. Islands must fit inside the 0–1 UV square without overlapping (unless you're deliberately reusing space)." },
+        { "h4": "Texel Density · sharpness per patch", "p": "How many pixels each unit of surface gets. Keep density even across the whole body, or some areas read sharp and others blurry; give important areas (face/hands) a bit more." }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 04 · Where to put seams",
+      "h2": "Hide the seams where nobody sees them",
+      "paras": [
+        "Seams leave potentially visible joins in the texture. The principle: better to make a few extra cuts so it lays flat than to force big stretching to save seams—stretching looks far worse than a seam. But hide the seams well:",
+        "🧵 Good places to hide seams",
+        "Inner arm, running one line along it",
+        "Inner / back of the leg, out of sight",
+        "Below the hairline at the back of the head, covered by hair",
+        "The back centerline of the body—symmetrical and hidden",
+        "Deep recesses like the armpit and crotch",
+        "Natural garment seams (cuffs, collar, side seams)",
+        "The boundary between gear and body",
+        "The joins between head / body / limbs",
+        "💡 Modern 3D painting (e.g. Substance) can paint straight across seams, so seams aren't as deadly as they used to be. But when baking normals, still leave enough margin at seams to prevent bleeding."
+      ],
+      "box": []
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 05 · Step by step",
+      "h2": "From the first seam to a packed UV layout",
+      "intro": null,
+      "substeps": [
+        {
+          "tag": "5.1",
+          "title": "Mark Seam",
+          "opt": null,
+          "paras": [
+            "Enter Edit Mode, select edges following the 'hide the seam' principle from 04, then Ctrl E → Mark Seam. How to plan it:"
+          ],
+          "bullets": [
+            "First segment the character: head, torso, arms, hands, legs, feet—each able to flatten on its own.",
+            "Tubular parts (arms, legs): cut one straight seam along the inner side.",
+            "Mark and unwrap separate parts (weapon, helmet) on their own.",
+            "Marked one wrong: select the edge, Ctrl E → Clear Seam to undo it."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "5.2",
+          "title": "Unwrap",
+          "opt": "Pick the right method",
+          "paras": [
+            "Select all, press U to open the unwrap menu. For characters, prefer Minimum Stretch:",
+            "Unwrap method · how to choose",
+            "Minimum Stretch — first choice · SLIM algorithm, minimizes both area and angle distortion; most stable for character bodies",
+            "Angle Based — the classic default, good enough in most cases",
+            "Conformal — fast, but higher distortion; rarely used",
+            "Smart UV Project — auto-seams + unwraps; for hard-surface / props / when you're short on time"
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": [
+            { "type": "tip", "text": "💡 Turn on Live Unwrap: pin a few points with P then drag, and the rest re-unwraps in real time—great for straightening borders and steering flow. Turn it off when done (it's stored in the scene)." }
+          ]
+        },
+        {
+          "tag": "5.3",
+          "title": "Check stretching",
+          "opt": "Must-do",
+          "paras": [
+            "Unwrapped isn't the same as unwrapped well. In the UV editor, turn on the Stretching overlay and read the heatmap:"
+          ],
+          "bullets": [
+            "Angle stretch: anything past green needs fixing—add a seam or straighten the island.",
+            "Area stretch: roughly even color is fine, meaning consistent resolution.",
+            "Wherever it's badly red, go back and add a seam nearby and re-unwrap."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "5.4",
+          "title": "Unify texel density",
+          "opt": "Even sharpness",
+          "paras": [
+            "Check with a checker texture: all squares looking the same size = even density."
+          ],
+          "bullets": [
+            "Create a Checker texture and temporarily assign it to the model's Base Color to inspect.",
+            "Select all islands → UV ▸ Average Islands Scale to unify density in one click.",
+            "Then you can scale up the face and hands (more pixels) and shrink unimportant islands.",
+            "Texel density concept: pixels / cm. Use one consistent value across the whole texture set—especially important for team collaboration."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "5.5",
+          "title": "Pack",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Pack islands that share a material (texture atlas) into the same UV square.",
+            "UV ▸ Pack Islands, and set a proper Margin (to prevent bake bleeding—leave roughly ~8–16px worth of margin for a 512 texture).",
+            "Blender's built-in packing treats islands as bounding boxes, so concave shapes waste space; to squeeze every bit of room, use UVPackmaster / Zen UV add-ons.",
+            "Keep islands aligned upright (horizontal/vertical) to make later hand-painting easier."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "5.6",
+          "title": "Reuse and symmetry",
+          "opt": "Space-saving tricks",
+          "paras": [],
+          "bullets": [
+            "Stack symmetric/identical parts: left and right hands, left and right boots can overlap onto the same UV, saving half the space (but the two sides then share a texture, so watch out for asymmetric detail).",
+            "Use Sphere Projection for spherical parts (eyeballs) and Cylinder Projection for tubular ones—tidier than a generic unwrap.",
+            "Archive the full low-poly with UVs into 05_uv."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 06 · Key discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① Stretching is the big enemy, seams are the lesser evil. Better to make a few extra cuts and hide the seams than to leave large stretched areas—stretching kills sharpness and looks ugly no matter how you paint.",
+        "② Texel density even across the whole body. Checker squares the same size is the hard test for passing UVs. Give important areas a bit more, but don't let it swing big to small.",
+        "③ The next two steps both ride on this UV. Baking and painting are all built on the UVs; any laziness here, Modules 06 and 07 pay back double."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 07 · Common wipeouts",
+      "h2": "These traps only blow up at the texturing stage",
+      "items": [
+        "Keeping the AI's shattered UVs → uneditable, painting falls apart.",
+        "Too scared of seams to cut → large-area stretching, checker squares pulled into strips.",
+        "Seams placed on a visible front face → the texture seam lands right on the face.",
+        "Texel density swinging big to small → blurry face but ultra-sharp boots, breaks the illusion.",
+        "Packing with no margin → islands bleed into each other when baking.",
+        "Passing without a checker check → stretch and density problems all left for the texturing stage.",
+        "Mixing different materials into one UV → messy atlas management."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 08 · Deliverables for this section",
+      "h2": "Tick these all off to pass",
+      "items": [
+        { "text": "A full UV set redone on the clean low-poly", "small": "Ditch the AI's UVs" },
+        { "text": "Seams hidden away, stretching within acceptable range", "small": "Angle stretch stays under green" },
+        { "text": "Density verified even with a checker", "small": "Face/hands may be scaled up" },
+        { "text": "Islands packed neatly with enough margin", "small": "Same material, same UV space" },
+        { "text": "Low-poly with UVs archived", "small": "→ 05_uv" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 09 · Self-check before moving on",
+      "title": "🐾 Three questions—pass all to proceed",
+      "questions": [
+        "With the checker applied, are the squares uniform in size across the whole body, none stretched long?",
+        "Are all seams hidden in inconspicuous spots (inner arm / back centerline / hairline)?",
+        "Do islands avoid overlap, keep margin, and pack same-material into the same UV?"
+      ],
+      "pass": "▸ All three pass → on to Module 06: Texture Baking (◐ AI + hand-fix)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

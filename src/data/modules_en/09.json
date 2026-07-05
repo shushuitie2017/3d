@@ -1,0 +1,224 @@
+{
+  "num": "09",
+  "title": "Export to Engine",
+  "badge": "Module 09 · Export ⚡ AI-fast",
+  "objective": "Bring your rigged character into Unity 6 / Unreal Engine 5, then check scale, materials, and animation for final sign-off. Finish this step and you're holding a real, game-ready, portfolio-ready character — the production line closed end to end.",
+  "meta": [
+    { "k": "Time", "v": "30–90 min" },
+    { "k": "Difficulty", "v": "⚡ AI-fast" },
+    { "k": "Tools", "v": "Unity 6 · UE5 · Blender" },
+    { "k": "Deliverable", "v": "Finished character, in-engine" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "Finish line: into the engine, checked, shipped",
+      "paras": [
+        "Picking up from Module 08: you have a rigged, animated character — now you move it into a game engine and get it running.",
+        "The tech here is easy, but it's where the classic disasters strike: you drag it in and — textures gone, scale blown up to giant size, character face-planted into the floor. None of that means your model is broken; it means the data conventions of your DCC software and the engine don't line up. This step is all about making that handoff clean."
+      ],
+      "box": []
+    },
+    {
+      "type": "branches",
+      "snum": "/ 02 · Pick a format",
+      "h2": "GLB or FBX? This decides whether your materials survive",
+      "branches": [
+        {
+          "name": "GLB / glTF",
+          "p": "Carries metallic-roughness PBR natively — base color, metallic, roughness, normal all in one pass, textures embedded in a single file. Unity/UE/Godot/Web all eat it. Try this first for characters.",
+          "code": "材质最稳 · PBR 材质干净过去"
+        },
+        {
+          "name": "FBX",
+          "p": "The engine standard (best skeletal-animation compatibility, especially), but it predates PBR — metallic/roughness/normal often get dropped, and usually only base color transfers reliably, so you reconnect textures by hand.",
+          "code": "骨骼最稳 · 骨骼动画首选 · 材质手动接"
+        }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 03 · Step by step",
+      "h2": "From export to standing firm in the engine",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "9.1",
+          "title": "Export settings",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Apply all transforms (reset position/rotation/scale), then export.",
+            "Check the axes: Blender is Z-up, most engines are Y-up — set Forward/Up correctly on export so you don't get a face-plant.",
+            "Tick embed textures (GLB does this by default); FBX carries a separate textures folder.",
+            "Skeletal animation: confirm the export includes the Armature + animation tracks."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.2",
+          "title": "Import into the engine",
+          "opt": "kill the recompute",
+          "paras": [],
+          "bullets": [
+            "Drag into Unity 6 (source file stays in Assets, the engine converts to an internal format) or UE5's Content.",
+            "Turn off Recompute Normals / Recompute Tangents — so the normals you baked in Module 06 don't get overwritten by the engine.",
+            "Remember to import the textures folder along with it."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.3",
+          "title": "Fix scale and orientation",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Unit mismatch: Unity 1 unit = 1 meter; UE 1 unit = 1 centimeter. If the scale is off, adjust the Scale Factor / import scale.",
+            "Check against reference: a humanoid is roughly 1.8 m tall — don't let it become a giant or an ant.",
+            "Wrong orientation (face-planting, lying down) = axes didn't line up; go back to 9.1 and reset the export axes."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.4",
+          "title": "Hook up materials",
+          "opt": "color space",
+          "paras": [],
+          "bullets": [
+            "Connect the PBR textures from step 07 to the engine's metallic-roughness material (GLB usually wires this up automatically).",
+            "Get the color space right: base color / emissive are sRGB; normal / roughness / metallic / AO are linear (non-color). Swap them and the result goes gray and muddy.",
+            "Watch for channel-packing differences: Unity and UE pack metallic/AO/roughness differently, so repack when needed."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.5",
+          "title": "Hook up skeleton and animation",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Import as a Skeletal Mesh (UE) / set up a Humanoid Avatar (Unity).",
+            "The effort you spent in Module 08 standardizing bone names pays off here: animations retarget straight away, no redo.",
+            "Play an animation through once and confirm the deformation matches what you had before export."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.6",
+          "title": "LODs and collision",
+          "opt": "depends on use",
+          "paras": [],
+          "bullets": [
+            "For a game: generate LODs (low-poly versions at distance to save performance) and add collision as needed.",
+            "For a pure portfolio showcase: you can skip this and put your energy into lighting and rendering."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "9.7",
+          "title": "Final sign-off + render out",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Drop it into a lit scene and orbit around to check the materials read right under real lighting.",
+            "Play the animation + pull back to confirm the deformation is clean and the silhouette holds up.",
+            "For the portfolio: record a turntable + idle/walk animations and grab a few still frames. That's your finished piece."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 04 · Engine cheat sheet",
+      "h2": "Unity 6 vs UE5 — the key differences",
+      "paras": [
+        "Two engines · checklist",
+        "Units: Unity 1 unit = 1m · UE 1 unit = 1cm",
+        "Preferred format: both eat FBX/GLB · GLB first for character materials",
+        "Import normals: turn off Recompute Normals/Tangents in both",
+        "Materials: both use metallic-roughness PBR · check color space",
+        "Animation retargeting: Unity Humanoid Avatar · UE IK Rig Retarget"
+      ],
+      "box": []
+    },
+    {
+      "type": "prose",
+      "snum": "/ 05 · Core discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① Keep materials alive — favor GLB. FBX dropping PBR is the number-one disaster; try GLB first for any textured character.",
+        "② Turn off normal recompute. Otherwise the engine overwrites the normals you worked so hard to bake, and it's all for nothing.",
+        "③ Keep color spaces straight. Base color / emissive are sRGB, everything else is linear — swap them and the whole character goes gray."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 06 · Common wipeouts",
+      "h2": "The three classic import disasters",
+      "items": [
+        "Textures all gone → FBX dropped the PBR; switch to GLB or reconnect textures by hand.",
+        "Scale is a giant / an ant → unit mismatch; adjust the Scale Factor.",
+        "Character face-planting / lying down → axes didn't line up; reset export Forward/Up.",
+        "Normals look blue, surface is weird → recompute wasn't turned off / tangent space mismatch (go back to 06 and check).",
+        "Whole character goes gray and muddy → color space swapped (normal/roughness wrongly set to sRGB).",
+        "Animation won't retarget → bone names aren't standardized (go back to 08 and rename).",
+        "Performance stutters → no LODs, still running full poly count at distance."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 07 · This step's deliverable",
+      "h2": "Tick these off and you've graduated",
+      "items": [
+        { "text": "Character in-engine: scale right, orientation right", "small": "~1.8m, standing on the ground, facing front" },
+        { "text": "Materials correct under real lighting", "small": "metal reflects, cloth is matte, no gray-out" },
+        { "text": "Animation plays and retargets", "small": "deformation matches pre-export" },
+        { "text": "A portfolio showcase clip", "small": "turntable + idle/walk + stills" },
+        { "text": "Full project files archived", "small": "→ 09_engine, all nine steps kept on record" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 08 · Final self-check",
+      "title": "🐾 Three questions — pass all and you've made it",
+      "questions": [
+        "Orbit around in a lit scene — are materials, scale, and orientation all right?",
+        "Play the animation — is the deformation clean and the silhouette solid?",
+        "Can you record a turntable + animation and drop it into your portfolio?"
+      ],
+      "pass": "▸ All three pass → congrats, your character went from concept to engine. 🐾"
+    },
+    {
+      "type": "prose",
+      "snum": "/ Fin · The whole pipeline in review",
+      "h2": "Nine steps, one line — you walked the whole thing",
+      "paras": [
+        "01 Concept design · AI generates multi-view reference · ⚡ AI",
+        "02 3D model generation · image to base mesh · ⚡ AI",
+        "03 Sculpting · clean-up, reshaping, locking the silhouette · 🐾 guided",
+        "04 Retopology & optimization · clean low-poly + edge loops · 🐾 guided",
+        "05 UV unwrapping · flatten, hide seams, unify density · ◐ hands-on",
+        "06 Texture baking · high-poly detail → normal and other maps · ◐ hands-on",
+        "07 Painting + materials · AI base color + hand-tuned PBR · ◐ hands-on",
+        "08 Rigging + animation · auto-rig + weight fixes · 🐾 guided",
+        "09 Export to engine · into Unity / UE5, closing the loop · ⚡ AI",
+        "From a single sketch to an engine-ready character",
+        "The slow grind you handed to AI; the craft you practiced with your own hands. This production line now lives in you — it won't age out with any single tool, because what you understand is the logic of the whole line.",
+        "Next up: take this workflow and make your own second character, then a third. Faster each time, and more and more like you. 🐾"
+      ],
+      "box": []
+    }
+  ],
+  "prev": null,
+  "next": null
+}

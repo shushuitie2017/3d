@@ -1,0 +1,202 @@
+{
+  "num": "04",
+  "title": "Retopology & Optimization",
+  "badge": "Module 04 · Retopology 🐾 Bluecat-coached",
+  "objective": "Turn that heavy, messy high-poly into a clean, lightweight, deformable low-poly. This is the most experience-hungry stretch of the whole pipeline—one edge loop in the wrong place and everything downstream stretches and pinches. The 2026 play: let AI go first, finish by hand.",
+  "meta": [
+    { "k": "Time", "v": "2–5 hours" },
+    { "k": "Difficulty", "v": "🐾 Bluecat-coached" },
+    { "k": "Tools", "v": "Blender · Tripo/Meshy · QuadRemesher" },
+    { "k": "Deliverable", "v": "Clean low-poly aligned to the high-poly" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "The high-poly is for show; only the low-poly ships in-game",
+      "paras": [
+        "Picking up from Module 03: that sculpted high-poly with hundreds of thousands of faces and chaotic topology can't be used as-is—it has to be \"translated\" into a clean low-poly.",
+        "The high-poly's problems: face count blowup (the engine chokes) and chaotic topology (can't deform, can't UV). Retopology means \"laying a fresh, clean mesh over the high-poly surface,\" yielding a lightweight, mostly-quad low-poly that can bend and move.",
+        "🎯 This low-poly is the model that actually ships in-game. Unlike sculpting—this topology follows the character all the way to the engine, so you have to take it seriously. UV (05), baking (06), texturing (07), and rigging (08) are all built on top of it."
+      ],
+      "box": []
+    },
+    {
+      "type": "rules",
+      "snum": "/ 02 · What makes good topology",
+      "h2": "The 5 rules of good topology",
+      "intro": "This is the soul of the section. If these 5 rules don't click, you won't be able to judge whether the AI's output is any good.",
+      "rules": [
+        { "h4": "Mostly quads", "p": "Animation demands quads. Quads deform far better than triangles; avoid triangles and n-gons (5+ sides) where you can, and confine them to non-deforming dead corners." },
+        { "h4": "Loops follow the deformation", "p": "Joints need edge loops wrapping around them: elbow, knee, shoulder, hip, wrist, neck. The face needs an eye loop and a mouth loop. Get the loops right and the bends stay natural instead of collapsing." },
+        { "h4": "Density where it's needed", "p": "Denser where there's heavy deformation and lots of detail (face, hands, joints); sparser on flat regions (thighs, chest, back). Don't run one density over the whole body." },
+        { "h4": "Poles in the right spots", "p": "Poles—where three or five edges converge—are unavoidable, but keep them out of deforming areas (joints, the center of the face); tuck them into hidden, flat regions." },
+        { "h4": "Smooth, non-fighting edge flow", "p": "Run the lines along the muscle and structure with smooth transitions and no sudden twists. Chaotic flow causes stretching, pinching, and shading artifacts." }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 03 · The real 2026 play",
+      "h2": "AI runs the first 70%, you close the crucial 30%",
+      "paras": [],
+      "box": [
+        "Good news: automatic retopology can now get you 70% of the way to clean quads, sparing you the tedious large-area manual edge work of the past.",
+        "Bad news: it isn't one-click-done. The auto algorithm gives you an \"even distribution,\" but it doesn't know where your character needs to deform—the loops on the face, hands, and joints are often misplaced and need you to finish by hand.",
+        "So the real work of this section is all about \"spotting where the AI went wrong and fixing it by hand.\" That's exactly why it's the most experience-hungry stretch."
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 04 · Choosing a route",
+      "h2": "Four routes, pick by how important the character is",
+      "branches": [
+        { "name": "AI auto-retopology", "p": "Tripo Retopology / Meshy Remesh / 3D AI Studio Prism. Upload the high-poly, choose quads + a target face count, and a clean low-poly pops out in tens of seconds.", "code": "快 · 四边面 · 但关节/脸要手动收" },
+        { "name": "QuadRemesher", "p": "Exoside's paid Blender plugin (on par with ZRemesher). You can draw guide lines to control the edge flow—the most controllable of the auto-retopology tools.", "code": "付费 · 可引导 · 身体首选" },
+        { "name": "Blender QuadriFlow", "p": "The built-in Quad Flow Remesh (under Object Data Properties). Free; enable Preserve Sharp / Symmetry, though the edge-flow quality is only so-so.", "code": "免费 · 够用 · 质量中等" },
+        { "name": "Manual retopology", "p": "Poly Build + Shrinkwrap, or the RetopoFlow plugin. Slow, but gives you the most control over crucial areas like the face and hands.", "code": "慢 · 主角/脸部值得" }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 05 · Step by step",
+      "h2": "From high-poly to a shippable low-poly",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "4.1",
+          "title": "Set a face-count budget first",
+          "opt": null,
+          "paras": [ "Retopologizing without a budget is retopologizing without a target. Estimate a range by the character's importance and platform (triangle count, for reference only):" ],
+          "bullets": [],
+          "prompts": [],
+          "calls": [
+            { "type": "warn", "text": "The range is a reference, not the law—set it by your engine, platform, and how much screen time the character gets. The principle: as light as possible while still being \"enough.\"" }
+          ]
+        },
+        {
+          "tag": "4.2",
+          "title": "AI / auto-retopology first pass",
+          "opt": "opener",
+          "paras": [ "Drop the high-poly into an auto tool and dial in the key settings:" ],
+          "bullets": [
+            "Output = Quads—mandatory for any character you'll animate.",
+            "Fill in the target face count per your 4.1 budget.",
+            "Enable Symmetry and Preserve Sharp.",
+            "If the high-poly is over 100k faces, do a rough decimate first to give the algorithm a clean starting point.",
+            "If you change the geometry, turn on the texture-bake option, or the textures won't line up."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "4.3",
+          "title": "Inspect the edge flow",
+          "opt": "the key judgment",
+          "paras": [ "Don't take the auto result at face value. Turn on wireframe and check it against all 5 rules of good topology:" ],
+          "bullets": [
+            "Do the joints have loops? Elbow/knee/shoulder/hip—a jointless loop collapses the moment it bends.",
+            "Does the face have an eye loop and a mouth loop? This is where auto-retopology most often faceplants.",
+            "Are there triangles/poles stuck in a deforming area? Move them to a flat, hidden spot.",
+            "Is the density sensible? Dense where it should be (face, hands, joints), lean where it can be."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "4.4",
+          "title": "Fix the crucial areas by hand",
+          "opt": "the real skill",
+          "paras": [ "Fix the problems you found during inspection by hand in Blender. Go-to techniques:" ],
+          "bullets": [
+            "Poly Build tool: lay and connect quads by hand on the high-poly surface, redoing crucial areas like the face and hands.",
+            "Shrinkwrap modifier: snaps the low-poly you're drawing onto the high-poly surface in real time.",
+            "Loop Cut Ctrl R: add a deformation loop around a joint.",
+            "Dissolve/Merge X→Dissolve: delete spare edges and kill bad poles.",
+            "Turn on X Symmetry, fix only one half, and mirror at the end."
+          ],
+          "prompts": [],
+          "calls": [
+            { "type": "tip", "text": "Turn on the Retopology overlay (in Viewport Overlays) plus surface snapping, and the lines you draw will hug the high-poly instead of sinking in or floating off." }
+          ]
+        },
+        {
+          "tag": "4.5",
+          "title": "Align to the high-poly",
+          "opt": "paving the way for baking",
+          "paras": [ "The low-poly has to hug the high-poly surface so Module 06's bake can accurately \"stamp\" the high-poly detail onto it." ],
+          "bullets": [
+            "Use Shrinkwrap to snap the whole thing on, then manually check for spots where the low-poly pokes through the high-poly or drifts too far away.",
+            "Having the low-poly sit slightly outside the high-poly is better than sinking in (less likely to miss rays during baking)."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "4.6",
+          "title": "Optimize and health-check",
+          "opt": null,
+          "paras": [ "The cleanup before delivery—don't skip a single one:" ],
+          "bullets": [
+            "Merge doubles: Merge by Distance to clear overlapping vertices.",
+            "Check non-manifold: Select → All by Trait → Non Manifold, and fix any hits.",
+            "Unify normals: Shift N to recalculate them facing outward.",
+            "Clear n-gons: Select → All by Trait → Faces by Sides > 4, then move them to dead corners or split them into quads.",
+            "After finishing asymmetric details, confirm symmetry didn't mirror-duplicate them."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 06 · Core discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① Loops serve deformation, not looks. The first purpose of topology is to let the character bend and move; joint and face loops get top priority.",
+        "② Animation means quads—don't cut corners with triangles. Triangles distort during deformation and shade wrong; only bury them in non-moving dead corners.",
+        "③ This is the final mesh—alignment and cleanliness can't be skipped. Unlike sculpting, which can be rough, the low-poly follows all the way to the engine; UV, baking, and rigging all ride on it, and any slack here compounds step after step."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 07 · Common wipeouts",
+      "h2": "The most experience-hungry stretch is the easiest to crash on",
+      "items": [
+        "Taking the AI's auto result at face value → jointless loops that collapse the moment it moves.",
+        "One density over the whole body → face and hands too coarse, thighs wasting faces for nothing.",
+        "Triangles crammed into joints/face → warped deformation and dirty shading.",
+        "Poles stuck in a deforming area → stretching and pinching that no amount of weight painting can pretty up.",
+        "Low-poly not aligned to the high-poly → Module 06's bake is all misalignment and ray misses.",
+        "Diving in with no face-count budget → either it blows up and won't fit the engine, or you over-trim and lose the silhouette.",
+        "Forgetting the health check (doubles/normals/non-manifold) → repeated errors during the UV and rigging stages."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 08 · Section deliverables",
+      "h2": "Check all of these off to pass",
+      "items": [
+        { "text": "Mostly-quad low-poly that meets the face-count budget", "small": "silhouette matches the high-poly" },
+        { "text": "Deformation loops on the joints, eye and mouth loops on the face", "small": "elbow/knee/shoulder/hip/wrist + facial features" },
+        { "text": "Density allocated as needed, poles kept out of deforming areas", "small": "dense where it counts, lean where it can" },
+        { "text": "Low-poly aligned (wrapped) to the high-poly", "small": "ready for the Module 06 bake" },
+        { "text": "Health check passed and archived", "small": "no doubles/non-manifold/bad normals → 04_lowpoly" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 09 · Self-check before moving on",
+      "title": "🐾 Three questions—pass all to proceed",
+      "questions": [
+        "Does every joint have a loop, and does the face have an eye loop and a mouth loop?",
+        "Does the low-poly hug the high-poly, and is the face count within budget?",
+        "Is the health check clean—no doubles, no non-manifold, normals facing out?"
+      ],
+      "pass": "▸ All three pass → on to Module 05: UV Unwrapping (◐ AI + hand fixes)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

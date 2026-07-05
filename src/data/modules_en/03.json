@@ -1,0 +1,247 @@
+{
+  "num": "03",
+  "title": "Sculpting",
+  "badge": "Module 03 · Sculpting 🐾 Guided by Blue Cat",
+  "objective": "Clean up the AI blockout, reshape it, and lock the silhouette — turning \"a blob of mesh\" into \"a character with intent.\" This is the first real craft step AI can't do for you. Whether this course is worth taking becomes clear right here.",
+  "meta": [
+    { "k": "Time", "v": "2–4 hours" },
+    { "k": "Difficulty", "v": "🐾 Guided by Blue Cat" },
+    { "k": "Tools", "v": "Blender 4.5 LTS" },
+    { "k": "Deliverable", "v": "Cleaned-up high-poly model" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step is about",
+      "h2": "From \"a blob of mesh\" to \"a character with intent\"",
+      "paras": [
+        "Picking up from Module 02: that base mesh with the right silhouette but a rough surface and messy topology — now you sculpt it by hand into a real character.",
+        "AI-generated meshes share three common flaws: a pitted surface, vague anatomy, and fused-together parts. Sculpting fixes them one by one — repair the big defects, clean up the silhouette, strengthen the anatomy, and split parts ready for the next steps."
+      ],
+      "box": [
+        "Why must a human do this step? Because \"does it look good\" is a judgment, not a calculation. AI doesn't know your character's shoulders should be broader, the jaw sharper, or the cape more flowing — those aesthetic calls are yours alone to make.",
+        "That's also why it's tagged 🐾 Guided: the technique isn't hard, but the feel and the eye are, and those take practice. Blue Cat hands you the workflow and the judgment criteria; the rest is you sitting down and grinding it out."
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 02 · Must-dos before you sculpt",
+      "h2": "Retopo first, or you won't be able to sculpt at all",
+      "intro": "You can't sculpt AI topology as-is: the faces are wildly uneven, so it tears the moment you pull on it. Do this before anything else —",
+      "substeps": [
+        {
+          "tag": "Prep A",
+          "title": "Voxel Remesh",
+          "opt": "Required",
+          "paras": [ "Rebuild the messy mesh into a new, evenly distributed, sculptable one. Once you're in Sculpt Mode:" ],
+          "bullets": [
+            "Right-side Remesh panel → set Voxel Size (4.5 defaults to relative mode), or press Ctrl R in the viewport to drag the voxel size interactively.",
+            "Smaller voxels mean more detail and more faces. Start with a larger voxel for a clean base, then remesh smaller once you reach the detail stage.",
+            "Remeshing wipes the original UVs and sharp edges — that's fine, UVs get redone in Module 05."
+          ],
+          "prompts": [],
+          "calls": [
+            { "type": "tip", "text": "Remesh in stages: large voxels to set the form → medium voxels to add structure → small voxels to carve detail. Jump straight to tiny voxels and the machine chokes while you still can't sculpt fine detail." }
+          ]
+        },
+        {
+          "tag": "Prep B",
+          "title": "Know where the brushes live (this changed after 4.3)",
+          "opt": null,
+          "paras": [ "Since Blender 4.3, brushes are no longer tucked away in the left toolbar — they all live in the Asset Shelf at the bottom of the viewport:" ],
+          "bullets": [
+            "Click straight from the bottom Asset Shelf, or press Shift Space to pop it up and type the brush name to search.",
+            "The brush cursor color means something: yellow = move/deform brushes, red = smooth/flatten brushes, others = build-up/shaping brushes."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "Prep C",
+          "title": "Turn on symmetry + set up references",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Turn on X-axis Symmetry in the top header — sculpt both sides at once and save half the work.",
+            "For non-symmetric parts (a one-sided weapon, say) temporarily turn symmetry off and sculpt them separately, or mirror one side over with Symmetrize at the end.",
+            "Drop your Module 01 reference images in as background images in front/side view so you can check the silhouette anytime."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 03 · The brush arsenal",
+      "h2": "10 brushes cover 90% of the work",
+      "branches": [
+        { "name": "Grab · proportion powerhouse", "p": "Grabs vertices and drags them with the mouse. The go-to for adjusting big shapes and proportions — shoulder width, head size, limb length, all of it.", "code": "" },
+        { "name": "Elastic Deform · soft major reshaping", "p": "Like a liquify tool: broad, soft deformation without tearing. Better than Grab for reshaping a whole torso segment or stretching a limb.", "code": "" },
+        { "name": "Snake Hook · pull out forms", "p": "Pulls faces out into spikes, horns, or tentacles. Great for horns, tails, and cloth tips.", "code": "" },
+        { "name": "Clay Strips · volume workhorse", "p": "Square brush tip, aggressive, fast at building volume and muscle masses. The number-one workhorse early on — rough is fine, you'll refine later.", "code": "" },
+        { "name": "Clay · gentle build-up", "p": "The softer version of Clay Strips: builds volume while lightly smoothing, so transitions come out more natural.", "code": "" },
+        { "name": "Draw · general add/subtract", "p": "The most basic push out/in along the surface (hold Ctrl to reverse). Add small bumps, fill in a little material.", "code": "" },
+        { "name": "Crease · carve boundaries", "p": "Presses in thin, deep grooves. Carves muscle boundaries, cloth folds, and gear seams. Crease Sharp is even harder.", "code": "" },
+        { "name": "Inflate · puff up volume", "p": "Puffs out or deflates along the normals as a whole. Makes an area fuller, or fixes a spot that caved in.", "code": "" },
+        { "name": "Smooth · S / hold Shift", "p": "Smooths out irregularities — the most-used brush. Note: it shrinks volume, so don't overdo it and smooth the form away.", "code": "" },
+        { "name": "Scrape / Flatten · hard surface", "p": "Shaves faces flat into hard planes; Scrape can even carve a sharp junction. Essential for armor, blades, and machinery.", "code": "" }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 04 · Shortcuts to memorize",
+      "h2": "Hands on the keys, double your speed",
+      "paras": [
+        "Sculpt Mode · high-frequency shortcuts",
+        "F — brush size (drag, then click to confirm)",
+        "Shift + F — brush strength",
+        "S / hold Shift — temporarily switch to Smooth",
+        "Ctrl (hold while sculpting) — reverse (convex↔concave, add↔subtract)",
+        "Ctrl + R — interactive Voxel Remesh",
+        "M — Mask brush · Ctrl+I invert · Alt+M clear",
+        "Shift + Space — pop up the brush picker (type the name directly)",
+        "Ctrl + middle-mouse drag — non-destructive temporary brush-radius perspective tweak"
+      ],
+      "box": []
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 05 · Step by step",
+      "h2": "Big shape → structure → detail, always in that order",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "3.1",
+          "title": "Fix the big defects",
+          "opt": null,
+          "paras": [ "Handle the \"hard damage\" first, worry about beauty later. AI meshes commonly come with three injuries:" ],
+          "bullets": [
+            "Fused parts (armpits, crotch, fingers): Mask off one of them → Ctrl I to invert-select or Hide, separate them, then sculpt; for bad cases, remesh and pry apart with Grab.",
+            "Holes: Voxel Remesh can usually auto-fill them watertight; for the ones it can't, cover them with faces using Draw/Fill.",
+            "Weird bumps / hallucinated detail: Smooth them away, or Mask the surroundings to protect them and Flatten."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "3.2",
+          "title": "Lock the silhouette",
+          "opt": "Most important",
+          "paras": [ "The silhouette is a character's first impression — ten times more important than surface detail. This step uses only move-type brushes to adjust the big shape:" ],
+          "bullets": [
+            "Use Grab / Elastic Deform to adjust proportions: head-to-body ratio, shoulder width, limb length, pose tension.",
+            "Keep rotating the view — right in front view doesn't mean right in side view. Check front / side / 45°.",
+            "Compare against your Module 01 reference silhouette and push the outline until it's \"instantly recognizable.\""
+          ],
+          "prompts": [],
+          "calls": [
+            { "type": "rule", "text": "Set the viewport to a flat Matcap and zoom out to see the black silhouette. Can't tell who it is, outline vague → keep pushing with Grab, don't rush into detail." }
+          ]
+        },
+        {
+          "tag": "3.3",
+          "title": "Clean up anatomy and structure",
+          "opt": null,
+          "paras": [ "With the big shape locked, start building primary forms (major masses) → secondary forms (sub-structures):" ],
+          "bullets": [
+            "Clay Strips to build the major volumes: rib cage, pelvis, limb muscle groups, facial masses.",
+            "Crease to carve boundaries: between muscles, between features, between gear and body.",
+            "Smooth to tidy transitions after each pass, but hold back — don't flatten out the form you just built.",
+            "Always big to small: get every major mass right before touching secondary; get secondary right before touching detail."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "3.4",
+          "title": "Hard-surface vs. organic — handle them separately",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Hard surface (armor, blades, machinery): Scrape / Flatten to level planes, Crease / Trim tools to cut hard edges. You want clean planes + sharp junctions.",
+            "Organic (skin, muscle, cloth): mostly Clay / Inflate / Smooth, aiming for soft volume and smooth transitions.",
+            "Cloth folds: Crease to press grooves + Snake Hook to pull tips + Smooth to tidy up."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "3.5",
+          "title": "Set the pose straight",
+          "opt": null,
+          "paras": [ "What you hand off to retopo is ideally a clean A-pose (limbs away from the body, easier for flow and later rigging)." ],
+          "bullets": [
+            "Pose is off: use the Pose brush (with bone-like linkage) or Elastic Deform to bend the limbs back into an A-pose.",
+            "Don't do the final action pose here — leave action poses until after rigging (Module 08). For now, just aim for neutral, symmetric, and easy to flow."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "3.6",
+          "title": "Prep for splitting",
+          "opt": null,
+          "paras": [ "Get ready for later assembly and separate processing:" ],
+          "bullets": [
+            "Parts that can be handled separately (helmet, weapon, cape): Mask them out → Mask Extract into standalone objects, or split by Loose Parts.",
+            "Name every part clearly: body / armor / weapon / hair…",
+            "Archive the whole high-poly set into the 03_sculpt folder."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 06 · Key discipline",
+      "h2": "Three iron rules that separate beginners from pros",
+      "paras": [],
+      "box": [
+        "① Grade your forms, big to small. Primary form (major volumes) → secondary form (sub-structure) → tertiary form (skin / fine wrinkles). Never carve detail before the big shape is right — that's the king of rework.",
+        "② Don't obsess over the surface; the silhouette is king. If you zoom out to the black silhouette and can't tell who it is, all the pore detail in the world won't save it.",
+        "③ This isn't the final topology, so don't fuss over the flow. Sculpting is only about form; messy topo is fine — Module 04 retopo redoes the whole thing. Fussing over flow here = wasted effort."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 07 · Common wipeouts",
+      "h2": "Catch these halfway through and it's already too late",
+      "items": [
+        "Sculpting without remeshing → the mesh tears the moment you pull, and it only gets worse.",
+        "Jumping straight to detail → the big shape is off, so all the detail has to be scrapped and redone.",
+        "Over-using Smooth → volume gets wiped away and the character turns into a melted bar of soap.",
+        "Only checking front view → turn to the side and every flat, crooked, bulging spot is exposed.",
+        "Tiny voxels right off the bat → the machine freezes and the detail has nowhere to land.",
+        "Fussing over topology in the sculpt stage → Module 04 retopo redoes it anyway, so it's pure wasted work.",
+        "Forgetting to turn symmetry off for asymmetric detail → a one-sided weapon or scar gets mirrored into two."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 08 · Deliverables for this section",
+      "h2": "Check all of these to pass",
+      "items": [
+        { "text": "A high-poly model with a clear, instantly recognizable silhouette", "small": "holds up in front / side / 45°" },
+        { "text": "Big defects cleared", "small": "no fused parts / no holes / no hallucinated bumps" },
+        { "text": "Sound anatomy, cleanly graded forms", "small": "primary form → secondary form in place" },
+        { "text": "A clean A-pose", "small": "limbs away from the body, easy to retopo" },
+        { "text": "Parts separated and named, whole set archived", "small": "body / armor / weapon… → 03_sculpt" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 09 · Self-check before moving on",
+      "title": "🐾 Three questions — pass all to proceed",
+      "questions": [
+        "Zoom out to the black silhouette — can you tell it's your character?",
+        "Orbit all the way around — does the form hold up from every angle (not just a good-looking front view)?",
+        "Is the pose a clean A-pose with limbs separated, ready for the next step's flow?"
+      ],
+      "pass": "▸ All three pass → on to Module 04: retopology and optimization (🐾 Guided, the most experience-hungry stretch)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

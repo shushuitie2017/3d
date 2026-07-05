@@ -1,0 +1,211 @@
+{
+  "num": "06",
+  "title": "Texture Baking",
+  "badge": "Module 06 · Baking ◐ AI + hand-fix",
+  "objective": "\"Print\" the high-poly's detail onto the low-poly's textures, so a lightweight low-poly reads like a mesh with hundreds of thousands of faces. This step produces the normal map and other core textures — the inputs for texturing (07).",
+  "meta": [
+    { "k": "Time", "v": "1–3 hours" },
+    { "k": "Difficulty", "v": "◐ AI + hand-fix" },
+    { "k": "Tools", "v": "Marmoset · Blender · Substance" },
+    { "k": "Deliverable", "v": "Normal / AO / curvature / ID texture set" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "Making the low-poly \"pretend\" to be the high-poly",
+      "paras": [
+        "Picking up from Modules 04 + 05: you have a clean low-poly aligned to the high-poly, plus a good UV unwrap — baking marries the two, cooking the high-poly detail into the textures.",
+        "The principle: ray-project the high-poly geometry onto the low-poly surface, record the surface direction per pixel, and store it as a normal map. In-engine, put that map on the low-poly, light it, and it shows every bump of the high-poly — at a fraction of the face count."
+      ],
+      "box": [
+        "Key insight: a normal map can only \"fake\" surface relief — it can't change the silhouette. So the low-poly's outline has to be right back in Module 04 — baking can't rescue a crooked silhouette."
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 02 · Which maps you bake",
+      "h2": "One texture set, feeding the next step",
+      "paras": [
+        "More than just the normal. This set drives the materials and wear effects in Module 07:",
+        "Normal: must bake · fakes the high-poly's surface bumps on the low-poly (tangent space)",
+        "AO (ambient occlusion): self-shadowed darks in cavities and seams (deepen, dirty up)",
+        "Curvature: edge convex/concave info (drives wear, edge highlights)",
+        "Material ID: paint each part a flat color (instant per-region select while texturing)",
+        "Thickness: light-through / subsurface zones (ears, cloth edges (optional))",
+        "Position / Height: gradient / height info (optional, drives procedural effects)"
+      ],
+      "box": []
+    },
+    {
+      "type": "prose",
+      "snum": "/ 03 · Core principle: cage and rays",
+      "h2": "A bake lives or dies on the cage",
+      "paras": [],
+      "box": [
+        "During a bake, rays shoot from the low-poly surface toward the high-poly to sample it. The cage is a slightly inflated copy of the low-poly that wraps the high-poly — it dictates which direction the rays fire and how far.",
+        "Use a smooth (averaged) cage: it ignores the low-poly's own normals and projects uniformly from a smoothed direction, so hard edges don't split and leave gaps. This is the recommended approach in most cases.",
+        "Set the ray distance to just cover the whole high-poly: too short and the high-poly's protruding parts don't get sampled (black spots); too long and you sample neighboring faces you shouldn't (crosstalk)."
+      ]
+    },
+    {
+      "type": "rules",
+      "snum": "/ 04 · Prep you must do before baking",
+      "h2": "These four things stop 90% of bake errors",
+      "intro": "",
+      "rules": [
+        { "h4": "Naming pairs", "p": "Pair low and high by suffix — character_low / character_high — and the baker (Marmoset Quick Loader / Substance) groups them automatically. Wrong names = no match." },
+        { "h4": "Triangulate the low-poly", "p": "Triangulate before baking, and make sure the triangulation matches between the baker and the engine — otherwise the normals go wrong in-engine." },
+        { "h4": "Patch high-poly holes", "p": "If the high-poly has holes, rays hit nothing and you get black spots. Seal the holes first." },
+        { "h4": "Apply transforms + align", "p": "Apply Transform on both low and high (reset position/rotation/scale), and keep the low-poly snug against the high-poly (already done in Module 04)." }
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 05 · Tool routes",
+      "h2": "Where to bake? Four routes",
+      "branches": [
+        { "name": "Marmoset Toolbag", "p": "GPU baking, real-time preview, paint cage/skew in the viewport. What-you-see-is-what-you-get, the industry gold standard — our top pick for this section.", "code": "Paid · fastest at spotting flaws" },
+        { "name": "Blender built-in", "p": "Cycles' Selected to Active bake, with a cage + ray distance. Free and good enough, but no real-time preview — \"blind baking\" is slower.", "code": "Free · all inside Blender" },
+        { "name": "Substance Painter", "p": "Bake right inside your texturing app (Bake Mesh Maps). If Substance is your next step, baking there is the least hassle.", "code": "Seamless into 07" },
+        { "name": "AI auto-bake", "p": "If Module 04 used Meshy/Tripo auto-retopo with baking on, the normal is already generated. Quality is so-so, but fine for background characters.", "code": "Fast · so-so quality" }
+      ]
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 06 · Step by step",
+      "h2": "From pairing to one clean texture set",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "6.1",
+          "title": "Name pairs + import",
+          "opt": null,
+          "paras": [
+            "Name them _low / _high, then import into the baker. Matching names auto-form a single Bake Group. Split a complex character into groups by part (body, weapon, helmet each their own group) so they don't cross-talk."
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "6.2",
+          "title": "Set cage / ray distance",
+          "opt": "most critical",
+          "paras": [],
+          "bullets": [
+            "Start with an auto estimate (Marmoset's Estimate Offset / Blender's Extrusion + Max Ray Distance) so the cage roughly covers the high-poly.",
+            "Use a smooth cage, then fine-tune Max Offset: just enough to enclose the most protruding parts of the high-poly, no more, no less.",
+            "Orbit around and check: any low-poly poking out of the cage, or the cage sitting so far it samples a neighbor."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "6.3",
+          "title": "Bake the normal first, low-res test",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Bake a pass at 1024 first — low res, fast, and the flaws actually show up more clearly.",
+            "Get tangent space right: match your engine/Substance (most use MikkTSpace / xNormal-Mikk). Mismatch = blue-tinted normals and blown-out seams in-engine.",
+            "Put the normal on the low-poly and hunt for black spots, color fringing, misalignment, and rippling."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "6.4",
+          "title": "Fix the flaws",
+          "opt": "hand-fix here",
+          "paras": [],
+          "bullets": [
+            "Skewed-projection detail: Paint Skew in Marmoset to straighten it live; Paint Offset to tweak cage distance locally.",
+            "Black spots: usually a hole in the high-poly or a too-short cage — go back and seal the hole / add distance.",
+            "Rippling on curves: the low-poly doesn't have enough segments there — go back to Module 04 and add a few, or add a bevel — a normal can't change the silhouette.",
+            "Small floaters: screws, rivets and the like can \"float\" above the surface and bake separately, saving you high-poly work."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "6.5",
+          "title": "Bake the rest of the maps",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "AO: dial Search Distance until seams and cavities have clean darks; for characters, generally turn off Floor Occlusion.",
+            "Curvature: push Intensity up a bit for sharper edges, to drive wear in 07.",
+            "Material ID: paint each high-poly part a flat color (or use materials), bake the ID map, and select regions by color instantly in 07."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "6.6",
+          "title": "Output settings + export",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Final resolution: hero 2K–4K, secondary characters 1K–2K.",
+            "Edge padding (Padding/Dilation): crank it up to stop color bleeding across the seams between UV islands.",
+            "Export normals as 8-bit PNG (most engines want 8-bit); for extra smoothness, bake 16-bit then convert.",
+            "Naming convention: char_normal / char_ao / char_curv / char_id, filed as a set into 06_bake."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 07 · Key discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① The cage decides everything. Nine out of ten bake flaws come from a cage that doesn't wrap properly. Get the cage right before you talk textures.",
+        "② Tangent space and triangulation must match the engine. Looks great in the baker but blows out in-engine? Nine times out of ten these two don't line up.",
+        "③ Normals fix the surface, not the silhouette. Rippling or a wrong outline is a low-poly/segment problem — go back a step to fix it, don't grind on it in baking."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 08 · Common wrecks",
+      "h2": "These traps only show up in-engine",
+      "items": [
+        "Cage too short → protruding high-poly parts don't get sampled, a patch of black spots.",
+        "Cage too long / parts not grouped → samples neighboring faces, detail crosstalk.",
+        "Tangent-space mismatch → blue-tinted normals and weird lighting in-engine.",
+        "No triangulation before baking, or a mismatch → wrong, dirty normals in-engine.",
+        "Unsealed holes in the high-poly → rays hit nothing, black-hole flaws.",
+        "No padding → color bleeds at UV island edges, seams appear.",
+        "Counting on normals to fix rippling silhouettes → wasted effort, you have to go back to Module 04 and add segments."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 09 · This section's deliverables",
+      "h2": "Tick these off and you've passed",
+      "items": [
+        { "text": "A clean normal map", "small": "No black spots / crosstalk / seams, correct tangent space" },
+        { "text": "AO / curvature / ID maps", "small": "To drive materials and wear in 07" },
+        { "text": "Normal on the low-poly, detail reads like the high-poly", "small": "Low-poly + normal = high-poly look" },
+        { "text": "Resolution on spec, ample padding, 8-bit PNG", "small": "Hero 2K–4K" },
+        { "text": "Naming convention, whole set filed", "small": "char_normal/ao/curv/id → 06_bake" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 10 · Self-check before the next step",
+      "title": "🐾 Three questions — pass all to proceed",
+      "questions": [
+        "With the normal on the low-poly, does the detail read like the high-poly, free of black spots and color fringing?",
+        "Do the tangent space and triangulation match your target engine?",
+        "Are AO / curvature / ID all baked, named, and filed?"
+      ],
+      "pass": "▸ All three pass → on to Module 07: texturing + materials (◐ AI + hand-fix)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

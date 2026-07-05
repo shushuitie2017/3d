@@ -1,0 +1,71 @@
+{
+  "lang": "en",
+  "dir": "ltr",
+  "htmlLang": "en",
+  "siteName": "BlueCat 3D",
+  "tagline": "AI × 3D character pipeline · Tool rankings + hands-on course",
+  "nav": {
+    "leaderboard": "Tool Rankings",
+    "pipeline": "9-Step Pipeline",
+    "mentor": "About BlueCat",
+    "course": "The Course",
+    "cta": "Enroll",
+    "back": "← Back to the 9-Step Pipeline"
+  },
+  "hero": {
+    "kicker": "Tool rankings + hands-on course",
+    "title_a": "So many AI 3D tools —",
+    "title_b": "which one wins at each step?",
+    "sub": "One pipeline, from sketch to engine. <b>Read the rankings, then follow BlueCat's course end to end</b> and build a finished character ready for Unity / UE5.",
+    "cta_primary": "Enroll →",
+    "cta_ghost": "See the tool rankings first",
+    "stats": ["9 modules / 180+ min", "Blind-tested rankings", "One project throughout"]
+  },
+  "lb": {
+    "snum": "/ Tool Rankings · Leaderboard",
+    "h2": "Which tool for which step?",
+    "intro": "We put the leading AI 3D tools through the key steps of the character pipeline and ranked them one by one — <b>BlueCat tests every one by hand, judged purely on how well it works</b>. Hand the slow steps to AI; the craft, BlueCat trains you in.",
+    "tag_ai": "AI automated",
+    "tag_hand": "Handcraft",
+    "tag_mixed": "AI + hand-fix",
+    "footnote": "Method: {method} · Tested on {testedAt}"
+  },
+  "pipe": {
+    "snum": "/ 9-Step Pipeline · Pipeline",
+    "h2": "One pipeline, from sketch to engine",
+    "intro": "Nine steps, each one building on the last, each giving you an output you can check. <b>Hand the slow, automatable work to AI; the craft that truly decides the outcome, BlueCat trains you in.</b>",
+    "view": "View this step →"
+  },
+  "mentor": {
+    "snum": "/ About BlueCat · Mentor",
+    "h2": "Reading the rankings isn't enough — you only learn by doing it",
+    "role": "Digital-human product manager / bluecatbot.com owner / Bilibili creator",
+    "name": "BlueCat",
+    "bio": "Over the past few years I've walked the whole path of how AI reshaped the 3D and digital-human pipeline, step by step — which tools actually work, which are hype, and which steps you have to rescue by hand. I've hit every pitfall. Almost no one lays it out systematically: tutorials are everywhere, but there's no single path that takes you all the way from concept to an engine-ready character in one go. This course is the complete path I wish someone had just handed me back then."
+  },
+  "course": {
+    "snum": "/ The Course · The Course",
+    "h2": "BlueCat coaches you through building your own character",
+    "intro": "I'll walk you down this pipeline from start to finish — 9 modules, one project throughout. When you're done, you'll hold a <b>character ready for your portfolio and ready for the engine</b>."
+  },
+  "faq": {
+    "snum": "/ FAQ · FAQ",
+    "h2": "Still on the fence? Answers here"
+  },
+  "fcta": {
+    "h2": "Ready to build your own character?",
+    "p": "Read the tool rankings, then follow the 9-step pipeline end to end. Hand the slow steps to AI; the craft, BlueCat trains you in.",
+    "cta": "Enroll →"
+  },
+  "module": {
+    "crumb_home": "BlueCat 3D",
+    "crumb_pipeline": "9-Step Pipeline",
+    "why": "Why",
+    "prev": "← Previous",
+    "next": "Next →",
+    "first": "This is the first step",
+    "last": "This is the last step",
+    "of": "/ 09"
+  },
+  "footer": "© 2026 BlueCat · bluecatbot.com"
+}

@@ -1,0 +1,231 @@
+{
+  "num": "07",
+  "title": "Texturing + Materials",
+  "badge": "Module 07 · Texturing ◐ AI + hand-work",
+  "objective": "Dress your character in its final colors and materials—metal should catch light, skin should read soft, cloth should stay matte. AI lays down the base coat, you hand-paint the story, and together you build a complete set of PBR maps. This is where the character earns its visual identity.",
+  "meta": [
+    { "k": "Time", "v": "2–4 hours" },
+    { "k": "Difficulty", "v": "◐ AI + hand-work" },
+    { "k": "Tools", "v": "Substance · Meshy · ChatGPT" },
+    { "k": "Deliverable", "v": "Full PBR texture set" }
+  ],
+  "sections": [
+    {
+      "type": "prose",
+      "snum": "/ 01 · What this step does",
+      "h2": "From gray model to flesh and blood",
+      "paras": [
+        "Picking up from Modules 05 + 06: you've got clean UVs and baked normal/AO/curvature/ID maps—now turn them into real materials.",
+        "Texturing isn't just \"painting colors on.\" Modern games use PBR (physically based rendering): you define what material each surface is, and the engine lights it by the rules of physics. So what you're painting isn't one image—it's a set of maps, each describing color, whether it's metal, how rough it is, and where it glows."
+      ],
+      "box": []
+    },
+    {
+      "type": "prose",
+      "snum": "/ 02 · PBR in a nutshell",
+      "h2": "Five maps that define every material",
+      "paras": [
+        "Understand these five (the metallic/roughness workflow) and materials stop being a mystery:",
+        "Base Color — the raw surface color, no lighting baked in! Leave light to the engine",
+        "Metallic — is it metal or not, basically black or white",
+        "Roughness — rough (white) or smooth (black), the channel that tells the most story",
+        "Normal — from Module 06, surface bumps and detail",
+        "Emissive — the parts that glow on their own: eyes, runes, screens"
+      ],
+      "box": [
+        "Two make-or-break rules: ① Base Color must be \"flat\"—never paint shadows or highlights into it, or the moment the engine lights it, everything reads dirty; ② Roughness is the soul—wear, grime, new vs. old, it all lives here. Whether a character reads believable is 70% roughness."
+      ]
+    },
+    {
+      "type": "branches",
+      "snum": "/ 03 · Two approaches",
+      "h2": "Let AI do it all, or take full hand control?",
+      "branches": [
+        {
+          "name": "AI does it all",
+          "p": "Meshy text-to-texture / image-to-texture: one prompt yields a full PBR set (base color + roughness + metallic + normal + emissive). Good enough for background characters and quick color tests.",
+          "code": "分钟级 · 控制力弱"
+        },
+        {
+          "name": "Substance hand control",
+          "p": "Substance Painter, using Module 06's bakes to drive wear, full control with layers + masks. The ceiling for hero characters.",
+          "code": "慢 · 完全掌控"
+        },
+        {
+          "name": "Hybrid",
+          "p": "AI lays the base, Substance refines. AI skips the tedious under-painting so you can spend your effort on the face, seams, and story details.",
+          "code": "快又可控 · 本节主推"
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 04 · How to use the bakes",
+      "h2": "Module 06's work pays off here",
+      "paras": [
+        "In Substance, the maps you baked in 06 aren't there to look at—they're there to drive detail: procedurally generating realistic wear ten times faster than painting by hand:",
+        "Curvature → drives edge wear: raised edges automatically expose metal / chip paint.",
+        "AO → drives grime in crevices: seams and recesses automatically collect dust and dirt.",
+        "Material ID → instant selections: one click selects \"all metal parts\" or \"all leather,\" then texture each separately."
+      ],
+      "box": []
+    },
+    {
+      "type": "workflow",
+      "snum": "/ 05 · Step by step",
+      "h2": "From a single prompt to a finished texture set",
+      "intro": "",
+      "substeps": [
+        {
+          "tag": "7.1",
+          "title": "AI base-color first pass",
+          "opt": null,
+          "paras": [
+            "First let Meshy texture a pass onto your own UVs (turn on enable_original_uv) to get a complete PBR starting point. The more specific the prompt, the better: material + finish + color + amount of wear + style.",
+            "For multi-part characters you can give each material slot its own prompt, or use Meshy's local re-texture (select the helmet/sword and change it alone)."
+          ],
+          "bullets": [],
+          "prompts": [
+            {
+              "label": "Meshy Texture · text-to-texture",
+              "text": "[材料+颜色+做工+磨损], PBR, [stylized game / semi-realistic],\nclean readable surface\n\n示例: weathered steel armor with gold trim, muted blue cloth,\nleather straps, subtle edge wear, stylized game character, PBR"
+            }
+          ],
+          "calls": [
+            {
+              "type": "tip",
+              "text": "Turn on \"remove highlights/shadows\" to flatten the base color—this is exactly the clean albedo PBR wants, and the engine handles lighting itself. Use ChatGPT to turn a vague idea into a specific prompt like the one above for a better hit rate."
+            }
+          ]
+        },
+        {
+          "tag": "7.2",
+          "title": "Into Substance + load the bakes",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Import the UV'd low-poly into Substance Painter.",
+            "Load the Normal / AO / Curvature / ID / Position / Thickness baked in 06 into Mesh Maps.",
+            "The AI base color can come in as a base layer to refine on top of."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "7.3",
+          "title": "Lay down base materials",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Zone by part with the ID mask: build a layer group each for metal, leather, cloth, and skin.",
+            "Drop a smart material / base material into each group first, setting the broad direction for base color + roughness + metallic.",
+            "This step gets the character \"in the ballpark\" first; detail comes later."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "7.4",
+          "title": "Add detail and story",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Use a curvature-driven generator to add edge wear (metal edges go bright, paint chips off).",
+            "Use AO-driven grime and dust in recesses and seams.",
+            "Hand-paint the finishing touches: the face, scars, insignia, and any seams that read wrong—paint them yourself.",
+            "Tell a story: is this gear brand-new or battle-worn? Where and how much it's worn IS the narrative."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "7.5",
+          "title": "Calibrate roughness / metallic",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Metal has to read as metal: metallic maxed out, roughness varied (fingerprints, oil film, scratches).",
+            "Skin/cloth are non-metal: metallic at 0, roughness alone separating silk (smooth) from coarse linen (matte).",
+            "Rotate the light and watch the highlights—it's the fastest way to check whether the PBR is right."
+          ],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "7.6",
+          "title": "Emissive",
+          "opt": "Bluecat signature",
+          "paras": [
+            "Put Emissive on whatever should glow: energy runes, screens, lamps. Give the eyes a gold emissive so they light up in the dark—that's the Bluecat signature 🐾."
+          ],
+          "bullets": [],
+          "prompts": [],
+          "calls": []
+        },
+        {
+          "tag": "7.7",
+          "title": "Export",
+          "opt": null,
+          "paras": [],
+          "bullets": [
+            "Pick the export preset for your engine (Unity / Unreal / glTF) so channel packing lines up automatically.",
+            "Confirm base color is flat (no lighting baked in).",
+            "Resolution: 2K–4K for a hero. Name them char_basecolor / _roughness / _metallic / _normal / _emissive and archive into 07_texture."
+          ],
+          "prompts": [],
+          "calls": []
+        }
+      ]
+    },
+    {
+      "type": "prose",
+      "snum": "/ 06 · Key discipline",
+      "h2": "Three iron rules",
+      "paras": [],
+      "box": [
+        "① Keep base color flat, leave light to the engine. Painting shadows and highlights into base color is the deadliest beginner mistake—change the light and it all goes dirty.",
+        "② Roughness tells the story. The same metal reads new, oily, or worn entirely through roughness. It sets the tone more than color does.",
+        "③ Let the bakes do the work. Generate wear and grime procedurally from curvature/AO—don't paint it stroke by stroke, it's slow and fake."
+      ]
+    },
+    {
+      "type": "pitfalls",
+      "snum": "/ 07 · Common wipeouts",
+      "h2": "These bite the moment the light changes",
+      "items": [
+        "Painting lighting into base color → the engine lights it, fake shadows stack on real ones, dirty.",
+        "Dead-flat roughness → every material looks like the same plastic.",
+        "Smearing mid-gray metallic everywhere → reads as neither metal nor non-metal, just weird.",
+        "Hand-painting all the wear → slow and unnatural, worse than curvature/AO driving it.",
+        "Shipping the AI base color unretouched → seams and the face fall apart under a close-up.",
+        "Export preset not matching the engine → channels misalign, everything goes black or glowing in-engine.",
+        "Not enough resolution / lighting not removed → blurry up close, dirty when the light changes."
+      ]
+    },
+    {
+      "type": "checklist",
+      "snum": "/ 08 · Deliverables for this step",
+      "h2": "Check these off to pass",
+      "items": [
+        { "text": "Complete PBR texture set", "small": "base color/roughness/metallic/normal/emissive" },
+        { "text": "Base color is flat, no lighting", "small": "stays clean under engine lighting" },
+        { "text": "Materials read right: metal like metal, cloth like cloth", "small": "verify by rotating the light on the highlights" },
+        { "text": "Wear/grime driven by bakes, face hand-retouched", "small": "has a story, holds up in close-up" },
+        { "text": "Exported with the target engine's preset, named and archived", "small": "→ 07_texture" }
+      ]
+    },
+    {
+      "type": "selfcheck",
+      "snum": "/ 09 · Self-check before moving on",
+      "title": "🐾 Three questions, pass all to proceed",
+      "questions": [
+        "Rotate the light—does every material read right (metal reflective, skin soft, cloth matte)?",
+        "Is the base color flat, with no lighting baked in?",
+        "Are the maps exported with the engine preset, named and archived?"
+      ],
+      "pass": "▸ All three pass → on to Module 08: Rigging + Animation (🐾 hands-on, the last tough nut)."
+    }
+  ],
+  "prev": null,
+  "next": null
+}

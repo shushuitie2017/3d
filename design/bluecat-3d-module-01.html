@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模块 01 · 概念设定 — 蓝猫 AI × 3D 角色产线</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --abyss:#090D18;--night:#0F1626;--surface:#161F35;--surface-2:#1C2742;
+  --line:rgba(110,150,220,.16);--line-2:rgba(110,150,220,.32);
+  --text:#E9EEFA;--muted:#90A0C0;--faint:#5E6E92;
+  --cobalt:#5B7CFA;--glow:#37E1FF;--gold:#F5C24E;
+  --gold-dim:rgba(245,194,78,.12);--cobalt-dim:rgba(91,124,250,.14);--glow-dim:rgba(55,225,255,.1);
+  --red:#F0685B;--red-dim:rgba(240,104,91,.1);
+  --green:#54C99A;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--abyss);color:var(--text);
+  font-family:"Inter","Noto Sans SC",system-ui,sans-serif;line-height:1.75;
+  -webkit-font-smoothing:antialiased;font-size:16px;overflow-x:hidden}
+.disp{font-family:"Sora","Noto Sans SC",sans-serif}
+.mono{font-family:"JetBrains Mono",monospace}
+.wrap{max-width:840px;margin:0 auto;padding:0 26px}
+a{color:inherit}
+
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bg::before{content:"";position:absolute;top:-220px;left:50%;transform:translateX(-50%);
+  width:720px;height:720px;border-radius:50%;
+  background:radial-gradient(circle,rgba(55,225,255,.08),transparent 60%);filter:blur(20px)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:rgba(9,13,24,.74);border-bottom:1px solid var(--line)}
+.nav-in{max-width:840px;margin:0 auto;padding:12px 26px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;font-family:"Sora",sans-serif;font-weight:700;font-size:16px;text-decoration:none}
+.brand svg{width:27px;height:27px;display:block}
+.nav-back{margin-left:auto;font-size:13.5px;color:var(--muted);text-decoration:none;
+  font-family:"JetBrains Mono",monospace;transition:color .2s}
+.nav-back:hover{color:var(--glow)}
+
+/* progress */
+.prog{position:sticky;top:52px;z-index:40;background:rgba(9,13,24,.74);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding:11px 0}
+.prog-in{max-width:840px;margin:0 auto;padding:0 26px;display:flex;align-items:center;gap:14px}
+.prog-bars{display:flex;gap:5px;flex:1}
+.prog-bars i{height:5px;flex:1;border-radius:3px;background:var(--surface-2)}
+.prog-bars i.on{background:linear-gradient(90deg,var(--cobalt),var(--glow))}
+.prog-bars i.cur{background:var(--gold);box-shadow:0 0 10px rgba(245,194,78,.5)}
+.prog-label{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--muted);white-space:nowrap}
+.prog-label b{color:var(--gold)}
+
+/* HERO */
+.lhead{position:relative;z-index:1;padding:48px 0 34px}
+.crumb{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--faint);margin-bottom:20px;letter-spacing:.04em}
+.crumb a{text-decoration:none;color:var(--muted)}
+.mod-badge{display:inline-flex;align-items:center;gap:10px;font-family:"JetBrains Mono",monospace;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--glow);
+  background:var(--glow-dim);border:1px solid var(--line-2);border-radius:30px;padding:6px 15px;margin-bottom:22px}
+h1.ltitle{font-family:"Sora","Noto Sans SC",sans-serif;font-weight:800;
+  font-size:clamp(30px,5.6vw,50px);line-height:1.1;letter-spacing:-.02em;margin-bottom:18px}
+.lobjective{font-size:clamp(16px,2.2vw,18.5px);color:var(--muted);max-width:640px;margin-bottom:28px}
+.lobjective b{color:var(--text);font-weight:600}
+.meta-row{display:flex;gap:10px;flex-wrap:wrap}
+.meta{display:flex;flex-direction:column;gap:3px;background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:11px 16px;min-width:0}
+.meta .mk{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.meta .mv{font-size:13.5px;color:var(--text);font-weight:600}
+.meta .mv.ai{color:var(--glow)}
+
+/* SECTION */
+section{position:relative;z-index:1;padding:36px 0;border-top:1px solid var(--line)}
+.snum{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);letter-spacing:.1em;margin-bottom:10px}
+h2.sh{font-family:"Sora","Noto Sans SC",sans-serif;font-weight:700;font-size:clamp(21px,3.2vw,28px);
+  line-height:1.25;letter-spacing:-.01em;margin-bottom:18px}
+p.tx{color:var(--muted);margin-bottom:16px;font-size:15.5px}
+p.tx b{color:var(--text);font-weight:600}
+p.tx .hl{color:var(--glow);font-weight:500}
+
+/* why box */
+.why{background:linear-gradient(150deg,var(--surface),var(--night));border:1px solid var(--line);
+  border-left:3px solid var(--gold);border-radius:0 12px 12px 0;padding:22px 26px}
+.why p{color:var(--text);font-size:15.5px;margin-bottom:12px}
+.why p:last-child{margin-bottom:0}
+.why b{color:var(--gold);font-weight:600}
+
+/* rules */
+.rules{display:grid;gap:12px;counter-reset:r}
+.rule{display:grid;grid-template-columns:40px 1fr;gap:16px;align-items:start;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.rule::before{counter-increment:r;content:counter(r);font-family:"Sora",sans-serif;font-weight:800;
+  font-size:22px;color:var(--cobalt);text-align:center;line-height:1.2}
+.rule h4{font-family:"Sora","Noto Sans SC",sans-serif;font-size:16px;font-weight:600;margin-bottom:5px}
+.rule p{font-size:14px;color:var(--muted);line-height:1.62}
+.rule p b{color:var(--text)}
+
+/* workflow sub-steps */
+.substep{position:relative;padding-left:26px;margin-bottom:30px;border-left:2px solid var(--line-2)}
+.substep:last-child{margin-bottom:0}
+.substep::before{content:"";position:absolute;left:-8px;top:4px;width:14px;height:14px;border-radius:50%;
+  background:var(--abyss);border:2px solid var(--gold)}
+.ss-tag{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.04em}
+.ss-title{font-family:"Sora","Noto Sans SC",sans-serif;font-size:19px;font-weight:600;margin:4px 0 12px}
+.ss-title .opt{font-size:12px;font-weight:400;color:var(--faint);font-family:"JetBrains Mono",monospace;
+  border:1px solid var(--line-2);border-radius:20px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+.substep p{font-size:14.5px;color:var(--muted);margin-bottom:12px;line-height:1.7}
+.substep p b{color:var(--text);font-weight:600}
+.substep ul{list-style:none;margin:0 0 14px;display:grid;gap:8px}
+.substep ul li{font-size:14px;color:var(--muted);padding-left:18px;position:relative;line-height:1.6}
+.substep ul li::before{content:"▸";position:absolute;left:0;color:var(--cobalt)}
+.substep ul li b{color:var(--text)}
+
+/* prompt box */
+.prompt{background:#0A0F1C;border:1px solid var(--line-2);border-radius:11px;overflow:hidden;margin:0 0 14px}
+.prompt-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(91,124,250,.08);
+  border-bottom:1px solid var(--line)}
+.prompt-label{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--cobalt);letter-spacing:.08em;
+  text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.prompt-label::before{content:"⌘";color:var(--glow)}
+.copy{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--muted);
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:6px;padding:4px 11px;cursor:pointer;
+  transition:color .2s,border-color .2s}
+.copy:hover{color:var(--glow);border-color:var(--glow)}
+.copy.done{color:var(--green);border-color:var(--green)}
+.prompt pre{margin:0;padding:16px 18px;font-family:"JetBrains Mono",monospace;font-size:12.5px;
+  line-height:1.65;color:#C7D4EE;white-space:pre-wrap;word-break:break-word;overflow-x:auto}
+.prompt pre .ph{color:var(--gold)}
+
+/* callouts */
+.call{border-radius:11px;padding:15px 18px;margin:0 0 14px;font-size:14px;line-height:1.65;display:flex;gap:13px;align-items:flex-start}
+.call .ci{flex-shrink:0;font-size:16px;line-height:1.4}
+.call.tip{background:var(--cobalt-dim);border:1px solid var(--line-2)}
+.call.tip b{color:var(--cobalt)}
+.call.warn{background:var(--gold-dim);border:1px solid rgba(245,194,78,.3)}
+.call.warn b{color:var(--gold)}
+.call.rule{background:var(--glow-dim);border:1px solid rgba(55,225,255,.28)}
+.call.rule b{color:var(--glow)}
+.call span{color:var(--text)}
+.call span b{font-weight:600}
+
+/* style branches */
+.branch{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.bcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 18px}
+.bcard h4{font-family:"Sora","Noto Sans SC",sans-serif;font-size:15.5px;font-weight:600;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+.bcard p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:9px}
+.bcard code{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--glow);background:var(--abyss);
+  border:1px solid var(--line);border-radius:5px;padding:6px 9px;display:block;word-break:break-word;line-height:1.5}
+@media(max-width:680px){.branch{grid-template-columns:1fr}}
+
+/* pitfalls */
+.pit{display:grid;gap:9px}
+.pit div{display:grid;grid-template-columns:auto 1fr;gap:12px;font-size:14px;color:var(--muted);
+  background:var(--red-dim);border:1px solid rgba(240,104,91,.22);border-radius:9px;padding:12px 15px;line-height:1.55}
+.pit div::before{content:"✕";color:var(--red);font-weight:700}
+.pit div b{color:var(--text);font-weight:600}
+
+/* checklist */
+.check{display:grid;gap:9px;margin-bottom:18px}
+.ci-row{display:flex;align-items:flex-start;gap:13px;background:var(--surface);border:1px solid var(--line);
+  border-radius:10px;padding:13px 16px;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
+.ci-row:hover{border-color:var(--line-2)}
+.ci-box{flex-shrink:0;width:21px;height:21px;border-radius:6px;border:2px solid var(--line-2);margin-top:1px;
+  transition:background .2s,border-color .2s;position:relative}
+.ci-row.done .ci-box{background:var(--green);border-color:var(--green)}
+.ci-row.done .ci-box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+  border:solid #0A0F1C;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.ci-text{font-size:14.5px;color:var(--text)}
+.ci-row.done .ci-text{color:var(--muted);text-decoration:line-through}
+.ci-text small{display:block;color:var(--faint);font-size:12.5px;text-decoration:none;margin-top:2px}
+
+/* self-check */
+.selfcheck{background:linear-gradient(150deg,var(--surface),var(--night));border:1px solid var(--line);
+  border-radius:14px;padding:24px 26px}
+.selfcheck h3{font-family:"Sora","Noto Sans SC",sans-serif;font-size:17px;margin-bottom:14px;color:var(--gold)}
+.selfcheck ol{margin:0 0 16px;padding-left:20px;display:grid;gap:9px}
+.selfcheck li{font-size:14.5px;color:var(--muted);line-height:1.6}
+.selfcheck li b{color:var(--text)}
+.selfcheck .pass{font-family:"JetBrains Mono",monospace;font-size:13px;color:var(--green)}
+
+/* nav buttons */
+.lnav{display:flex;justify-content:space-between;gap:14px;padding:34px 0 10px;border-top:1px solid var(--line)}
+.lnav a{flex:1;display:flex;flex-direction:column;gap:4px;text-decoration:none;padding:18px 22px;border-radius:13px;
+  border:1px solid var(--line);background:var(--surface);transition:transform .15s,border-color .2s}
+.lnav a:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.lnav a.disabled{opacity:.4;pointer-events:none}
+.lnav a.next{background:linear-gradient(150deg,rgba(245,194,78,.08),var(--surface));border-color:rgba(245,194,78,.3);text-align:right}
+.lnav .ln-k{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--faint);letter-spacing:.1em}
+.lnav .ln-v{font-family:"Sora","Noto Sans SC",sans-serif;font-size:16px;font-weight:600;color:var(--text)}
+.lnav a.next .ln-v{color:var(--gold)}
+@media(max-width:560px){.lnav{flex-direction:column}}
+
+footer{border-top:1px solid var(--line);padding:30px 0 50px;position:relative;z-index:1}
+footer .fm{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--faint);text-align:center;line-height:1.8}
+footer a{color:var(--muted);text-decoration:none}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .55s ease,transform .55s ease}
+.reveal.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}
+  .lnav a:hover{transform:none}.blink{animation:none!important}}
+.blink{animation:blink 5.5s infinite}
+@keyframes blink{0%,93%,100%{opacity:1}96%{opacity:.15}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="catGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6E8CFF"/><stop offset="1" stop-color="#3457D6"/></linearGradient>
+  <filter id="eyeGlow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="3.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <g id="bluecat">
+    <path d="M55,72 L45,20 L100,52 Z" fill="url(#catGrad)"/><path d="M205,72 L215,20 L160,52 Z" fill="url(#catGrad)"/>
+    <path d="M64,64 L58,34 L88,52 Z" fill="#2C3F8F"/><path d="M196,64 L202,34 L172,52 Z" fill="#2C3F8F"/>
+    <path d="M62,74 C62,50 92,42 130,42 C168,42 198,50 198,74 C200,98 196,150 170,178 C152,196 138,200 130,200 C122,200 108,196 90,178 C64,150 60,98 62,74 Z" fill="url(#catGrad)"/>
+    <g class="blink" filter="url(#eyeGlow)">
+      <ellipse cx="103" cy="106" rx="15" ry="20" fill="#F5C24E"/><ellipse cx="157" cy="106" rx="15" ry="20" fill="#F5C24E"/>
+      <ellipse cx="103" cy="106" rx="4.2" ry="15" fill="#1a1206"/><ellipse cx="157" cy="106" rx="4.2" ry="15" fill="#1a1206"/>
+      <circle cx="99" cy="99" r="3" fill="#fff" opacity=".85"/><circle cx="153" cy="99" r="3" fill="#fff" opacity=".85"/>
+    </g>
+    <path d="M130,140 L139,151 L121,151 Z" fill="#F2ECDF"/>
+    <path d="M130,151 Q124,160 115,155 M130,151 Q136,160 145,155" stroke="#0F1626" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <g stroke="#BBD0FF" stroke-width="1.6" stroke-linecap="round" opacity=".5">
+      <path d="M88,142 L42,134"/><path d="M88,150 L44,152"/><path d="M88,158 L48,168"/>
+      <path d="M172,142 L218,134"/><path d="M172,150 L216,152"/><path d="M172,158 L212,168"/></g>
+  </g>
+</defs></svg>
+
+<nav><div class="nav-in">
+  <a href="#" class="brand"><svg viewBox="0 0 260 240"><use href="#bluecat"/></svg>蓝猫 3D</a>
+  <a href="#" class="nav-back">← 返回九步产线</a>
+</div></nav>
+
+<div class="prog"><div class="prog-in">
+  <div class="prog-bars">
+    <i class="cur"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="prog-label"><b>01</b> / 09</div>
+</div></div>
+
+<header class="lhead">
+  <div class="wrap">
+    <div class="crumb"><a href="#">蓝猫 3D</a> / <a href="#">九步产线</a> / 模块 01</div>
+    <div class="mod-badge">Module 01 · Concept ⚡ AI 提速</div>
+    <h1 class="ltitle">概念设定</h1>
+    <p class="lobjective">产出一套<b>干净、能被 AI 准确转成 3D</b> 的 2D 参考图：一张定稿正视图 + 多视图转面（理想含侧 / 背 / 3-4 视）+ 可选分件图。这套图是后面 8 步的地基——它有多干净，你的 3D 角色就有多干净。</p>
+    <div class="meta-row">
+      <div class="meta"><span class="mk">时长</span><span class="mv">45–90 分钟</span></div>
+      <div class="meta"><span class="mk">难度</span><span class="mv ai">⚡ AI 提速</span></div>
+      <div class="meta"><span class="mk">工具</span><span class="mv">ChatGPT · Nano Banana Pro</span></div>
+      <div class="meta"><span class="mk">交付物</span><span class="mv">A-pose 多视图参考集</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- WHY -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 01 · 为什么这一步定生死</div>
+    <h2 class="sh">下游图生 3D 是"垃圾进、垃圾出"</h2>
+    <p class="tx">Meshy、Tripo 这类图生 3D 工具，几乎完全吃你喂进去的参考图。<b>你的参考有多干净，出来的 mesh 就有多干净。</b></p>
+    <div class="why">
+      <p>一张戏剧光、动态姿势、花背景的"好看插画"，到了 3D 生成器手里会变成<b>一坨融化的几何体</b>——腋下粘连、比例失真、背景也被建进网格。</p>
+      <p>所以这一步的目标<b>不是画得漂亮，是画得"能被机器读懂"</b>。投在这里的每一分钟，会在后面 8 步里成倍返还。</p>
+    </div>
+  </div>
+</section>
+
+<!-- HARD RULES -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 02 · 图生 3D 的 5 条硬规则</div>
+    <h2 class="sh">参考图必须同时满足这 5 条</h2>
+    <p class="tx">下面每一道工序，都是为了让最终参考满足这 5 条。先把规则记死，再动手。</p>
+    <div class="rules">
+      <div class="rule"><div></div><div><h4>A-pose / T-pose · 四肢分离</h4><p>手臂贴身躯，生成器分不清哪是手臂哪是身体，腋下会粘连。<b>A-pose（手臂下垂 30–45°）通常比 T-pose 更稳</b>，手腕也不容易和大腿穿模。</p></div></div>
+      <div class="rule"><div></div><div><h4>中性平光 · 无强阴影</h4><p>戏剧光、轮廓光会被<b>直接烤进几何和贴图</b>，进了 3D 改不掉。要的是均匀的影棚柔光。</p></div></div>
+      <div class="rule"><div></div><div><h4>纯色背景 · 无场景道具</h4><p>纯白或纯灰，无地面、无投影、无道具。<b>背景越干净，抠图和生成越准</b>，否则背景会被一起建模。</p></div></div>
+      <div class="rule"><div></div><div><h4>正交视角 · 无透视压缩</h4><p>平视、无大仰俯角。<b>透视会让生成器误判比例</b>——头大脚小、近大远小全乱套。</p></div></div>
+      <div class="rule"><div></div><div><h4>多视图一致 · 同一个角色</h4><p>正 / 侧 / 背是同一个人：同配色、同装备、同比例。<b>这是 AI 最难、也是本节核心战场</b>——靠一致性模型 + 参考输入解决。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 03 · 逐道工序</div>
+    <h2 class="sh">从一句点子，到一套合规参考</h2>
+
+    <!-- 1.1 -->
+    <div class="substep">
+      <div class="ss-tag">1.1</div>
+      <div class="ss-title">立意 · 先用文字把角色钉死</div>
+      <p>别一上来就抽卡。<b>先用 ChatGPT 把"设定"写清楚</b>：一句话概念、剪影特征、配色、标志性细节。文字越清楚，图越好出、越一致。直接套下面这条结构化 prompt：</p>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">构思 · ChatGPT</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>You are a senior character designer for a stylized 3D action game.
+Lock a production-ready character concept from my seed idea. Output:
+1. One-paragraph concept (who they are, their world)
+2. Silhouette features (what makes them readable as a black shape)
+3. Color palette: 3-4 hex colors with roles (primary / secondary / accent)
+4. 5 distinctive design details (gear, marks, materials)
+5. A ready-to-paste FRONT-VIEW image prompt: full-body, A-pose,
+   plain white background, neutral studio lighting.
+
+Seed idea: <span class="ph">[你的一句话点子，例如 a wandering blue-cat spirit swordsman]</span>
+Keep it production-oriented: clean silhouette, separable parts,
+no extreme anatomy that is hard to model.</pre>
+      </div>
+      <div class="call tip"><span class="ci">💡</span><span><b>为什么</b>：先有文字设定，后面每次生图都能引用同一套描述，是保证多视图一致的第一道保险。</span></div>
+    </div>
+
+    <!-- 1.2 -->
+    <div class="substep">
+      <div class="ss-tag">1.2</div>
+      <div class="ss-title">出正视图 master · 后面所有视图的真相源</div>
+      <p>用结构化 prompt 生成正视图，<b>一次多生几张</b>，挑剪影最强、最符合设定的那张。结构永远是：<span class="hl">主体 + 风格 + 姿势 + 取景 + 光 + 背景</span>。</p>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">正视图 master · 文生图</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>full-body character concept of <span class="ph">[角色描述]</span>, front orthographic view,
+A-pose with arms held ~35° away from the body, legs slightly apart,
+character reference sheet, flat even studio lighting, soft shadows only,
+plain solid white background, clean readable design, <span class="ph">[STYLE]</span>,
+symmetrical, entire figure visible head to feet, no cropping,
+high detail, sharp focus
+
+avoid: dramatic lighting, rim light, busy background, props, ground shadow,
+action pose, foreshortening, extreme perspective, multiple characters,
+text, watermark, cropped limbs</pre>
+      </div>
+      <div class="call rule"><span class="ci">🔬</span><span><b>剪影测试</b>：把选中的图变成纯黑剪影，还能一眼认出是谁吗？认不出 → 设计不够强，重抽。<b>好看 ≠ 好读</b>。</span></div>
+    </div>
+
+    <!-- 1.3 -->
+    <div class="substep">
+      <div class="ss-tag">1.3</div>
+      <div class="ss-title">定稿清理 · 把 master 收干净</div>
+      <p>选中那张后，用<b>图像编辑</b>把它收干净，然后锁死，不再改设计。这张就是你的 master。</p>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">清理定稿 · 图生图编辑</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>Using this image, keep the EXACT same character design, outfit and colors.
+Clean it up only:
+- remove the background to pure white
+- complete any cropped limbs so the full body (head to feet) is visible
+- flatten dramatic lighting into even neutral studio light
+- correct obvious proportion issues
+A-pose, front orthographic view. Do not redesign anything.</pre>
+      </div>
+    </div>
+
+    <!-- 1.4 -->
+    <div class="substep">
+      <div class="ss-tag">1.4</div>
+      <div class="ss-title">转面 / 多视图 · 用一致性模型从 master 派生</div>
+      <p>核心技巧：把 master 当<b>参考图</b>喂给 <span class="hl">Nano Banana Pro（Gemini 3 Pro Image）</span>——它的强项正是"角色身份锁定、跨图保持一致"，最多支持喂 14 张参考。让它只换视角、不改设计。</p>
+      <ul>
+        <li><b>单图转面表</b>（简单角色）：一张图里出正 / 侧 / 背三视，对齐同高度。</li>
+        <li><b>逐张派生</b>（复杂角色）：逐个视角生成，每次把 master + 已定视图<b>一起</b>喂进去当参考，一致性更稳。</li>
+      </ul>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">侧 / 背视派生 · Nano Banana Pro</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>Use the provided reference image as the single source of truth for this
+character. Generate the SAME character in a <span class="ph">[side profile / back]</span>
+orthographic view. Keep identical outfit, colors, proportions, gear and
+design details - this must read as the EXACT same character, just rotated.
+A-pose, flat neutral studio lighting, plain white background,
+character turnaround sheet style. Do not change or add any design element.</pre>
+      </div>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">一次出三视图 · turnaround</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>Create a character turnaround / model sheet of THIS exact character showing
+front, side and back views in a row. All A-pose, identical design and colors,
+flat neutral lighting, plain white background, evenly aligned at the same
+height and scale.</pre>
+      </div>
+      <div class="call tip"><span class="ci">💡</span><span><b>开 Thinking 模式</b>：Nano Banana Pro 的推理模式会先生成草图再定稿，复杂角色的一致性明显更稳。一致性还是飘？把已生成的视图也加进参考输入里，给它更多"锚点"。</span></div>
+    </div>
+
+    <!-- 1.5 -->
+    <div class="substep">
+      <div class="ss-tag">1.5</div>
+      <div class="ss-title">分件 · 拆出可单独生成的部件 <span class="opt">复杂角色才需要</span></div>
+      <p>武器、头盔、披风、大型配饰这类，<b>单独抠出来、纯白底、正交</b>。后面用更高质量单独生成 3D 再组装——比硬生一整个复杂角色干净太多。<b>能拆就拆。</b></p>
+      <div class="prompt">
+        <div class="prompt-bar"><span class="prompt-label">分件抽取 · 图生图</span><button class="copy" onclick="cp(this)">复制</button></div>
+        <pre>Isolate the <span class="ph">[weapon / helmet / cape]</span> from this character.
+Show it ALONE on a plain white background, orthographic front and side
+views, clean even studio lighting, no character, no background props,
+product-shot style, high detail.</pre>
+      </div>
+    </div>
+
+    <!-- 1.6 -->
+    <div class="substep">
+      <div class="ss-tag">1.6</div>
+      <div class="ss-title">整理交付 · 命名、对齐、归档</div>
+      <ul>
+        <li>统一分辨率与取景，<b>人物在画面里大小一致</b>，方便后面逐视图比对。</li>
+        <li>命名规范：<b>char_front / char_side / char_back / char_3q / part_weapon…</b></li>
+        <li>建一个 <b>01_concept</b> 文件夹，整套归档。这是进模块 02 的输入包。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STYLE BRANCHES -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 04 · 风格分支</div>
+    <h2 class="sh">同一套规则，三种风格微调</h2>
+    <div class="branch">
+      <div class="bcard"><h4>🛡️ 写实 / 半写实</h4><p>规则照旧，prompt 里追加风格词即可。3D 生成最友好的一类。</p><code>semi-realistic game character, PBR-friendly, neutral expression, balanced anatomy</code></div>
+      <div class="bcard"><h4>✨ 二次元 / 动漫</h4><p>注意：大眼、夸张比例会让 3D 生成更难，<b>剪影要更克制</b>。</p><code>anime style, cel-shaded, clean lineart, flat colors, readable silhouette</code></div>
+      <div class="bcard"><h4>🐱 卡通 / Q 版</h4><p>比例可以夸张，但<b>务必四肢分离、剪影清晰</b>，否则圆乎乎一团会粘连。</p><code>chibi / stylized cartoon, exaggerated proportions, separated limbs, bold shapes</code></div>
+    </div>
+  </div>
+</section>
+
+<!-- PITFALLS -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 05 · 常见翻车</div>
+    <h2 class="sh">这些坑，新手 80% 都踩过</h2>
+    <div class="pit">
+      <div><span><b>用了戏剧光 / 逆光</b> → 阴影被烤死，3D 阶段没法修。</span></div>
+      <div><span><b>动态姿势（跑、挥剑）</b> → 生成器读不出标准比例，肢体粘连。</span></div>
+      <div><span><b>透视太强</b> → 比例失真，头大脚小。</span></div>
+      <div><span><b>多视图各画各的</b> → 正侧背不是同一个人，后面拼不起来。</span></div>
+      <div><span><b>背景有道具 / 地面</b> → 生成器把背景一起建进 mesh。</span></div>
+      <div><span><b>一次硬生超复杂角色</b> → 细节糊成一团；该分件就分件。</span></div>
+      <div><span><b>抽到好看就停</b> → 没做剪影测试，好看 ≠ 好读。</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERABLES -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 06 · 本节交付物</div>
+    <h2 class="sh">勾完这些，才算过关</h2>
+    <div class="check">
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">1 张定稿正视图<small>A-pose / 中性光 / 纯白底 / 正交</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">至少 1 张背视图<small>同一角色，配色 / 装备 / 比例一致</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">理想：+ 侧视图 + 3/4 视图<small>视图越全，模块 02 生成越准</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">复杂角色：分件图若干<small>武器 / 头盔 / 披风，纯白底正交</small></div></div>
+      <div class="ci-row" onclick="tk(this)"><div class="ci-box"></div><div class="ci-text">全部命名归档进 01_concept<small>这是进下一步的输入包</small></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SELF CHECK -->
+<section class="reveal">
+  <div class="wrap">
+    <div class="snum">/ 07 · 进入下一步前自检</div>
+    <div class="selfcheck">
+      <h3>🐾 三问，全过才放行</h3>
+      <ol>
+        <li>把任意一张图变黑剪影，<b>还认得出角色吗</b>？</li>
+        <li>正 / 侧 / 背放一起，<b>是同一个人吗</b>（配色 / 装备 / 比例）？</li>
+        <li>有没有<b>任何强阴影、透视、花背景</b>还没清掉？</li>
+      </ol>
+      <p class="pass">▸ 三个都过 → 进入模块 02：3D 模型生成。</p>
+    </div>
+  </div>
+</section>
+
+<!-- LESSON NAV -->
+<div class="wrap">
+  <div class="lnav">
+    <a class="disabled"><span class="ln-k">← 上一节</span><span class="ln-v">已是第一节</span></a>
+    <a class="next" href="#"><span class="ln-k">下一节 →</span><span class="ln-v">模块 02 · 3D 模型生成</span></a>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap"><div class="fm">蓝猫 AI × 3D 角色产线 · 模块 01 / 09<br>© 2026 蓝猫 BlueCat · <a href="https://bluecatbot.com">bluecatbot.com</a></div></div>
+</footer>
+
+<script>
+  function cp(btn){
+    const pre=btn.closest('.prompt').querySelector('pre');
+    const txt=pre.innerText;
+    navigator.clipboard.writeText(txt).then(()=>{
+      btn.textContent='已复制 ✓';btn.classList.add('done');
+      setTimeout(()=>{btn.textContent='复制';btn.classList.remove('done')},1800);
+    }).catch(()=>{btn.textContent='复制失败';setTimeout(()=>btn.textContent='复制',1800)});
+  }
+  function tk(row){row.classList.toggle('done')}
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
