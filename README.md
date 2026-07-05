@@ -121,6 +121,11 @@ cd out && python -m http.server 5018      # 打开 http://127.0.0.1:5018/zh/
 | 🌐 站点矩阵 | [bluecatbot.com](https://bluecatbot.com) |
 | 🐙 GitHub | [@shushuitie2017](https://github.com/shushuitie2017) |
 
+<div align="center">
+<img src="./assets/contact-qr.jpg" alt="加微信 · 聊 AI 3D 产线与实战课" width="200"><br>
+<sub>👆 微信扫码，聊 AI 3D 产线 · 报名实战课</sub>
+</div>
+
 ### 也在做
 
 - 🎨 **[矢安 SVGSafe](https://svg.bluecatbot.com)** —— 授权清晰的免费 SVG 图标 / 插画库，6000+ 张
